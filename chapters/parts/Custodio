@@ -1,0 +1,127 @@
+Custodio
+
+\subsection{Algorithms}
+The processing algorithms by word found in the literature for the irreducible polynomials are an implementation using words of the general algorithm~\ref{alg:bits} of bits. These algorithms, therefore, do not take into account the possible redundant operations inside. One explanation for this could be the fact that for the small middle exponents, this redundancy is small, almost negligible. However, for large exponents the redundancy increases considerably. If the algorithm benefit from these redundancies, you can get algorithms as effective as, or perhaps even better, for irreducibles with great exponents. \\
+
+{\bf Custodio} Teremos nessa seção: \\
+a) Reducao por bit usando palavras\\
+b) Redução usando palavras do algoritmo geral de bits;\\
+c) Algoritmos do NITS por palavra;\\
+d) Nossos algoritmos otimizados ( $a=m/2$, $a \neq m/2$ ) processados por palavras;\\
+e) Novos algoritmos para os trinomios do NITS mas usando feito usando nosso algoritmo otimizado para a primeira faixa de $a$;\\
+ 
+
+\subsection{General by word bit processing}
+For low weight irreducible polynomials with middle terms close to each other or, in particular, trinomials, the reduction may be performed efficiently by words as shown in Algorithm~\ref{alg:wordbit:hankerson}\cite[p. 53]{Hankerson}. In this algorithm $$r(x) = f(x) + x^m$$\\
+
+{\bf Custodio} Verificar o algorithm. Explicar ( modificar ) $C\{j\}$. Fazer uma figura semelhante a Fig. 2.9 do Hankerson para explicar de forma geral este algoritmo. Apresentar uma análise de complexidade para este algoritmo. Por exemplo, a soma re $u_k$ pode ser feita por um $for$ de $W$ passos.
+
+\begin{algorithm}
+\begin{algorithmic}[1]
+  \REQUIRE $C[2m-2,0]$, $W$
+  \ENSURE $C[m-1,0]$
+  {\it Precomputation}. Compute $u_k = x^k r(x)$, $0 \leq k \leq W-1$ 
+  \FOR{$i \gets 2m-2$ \textbf{downto} $m$}
+    \IF{$C[i]=1$}
+      \STATE $j \gets \left \lfloor \frac{i-m}{W} \right \rfloor$
+      \STATE $k \gets (i-m) - Wj$
+      Add $u_k(x)$ to $C\{j\}$
+    \ENDIF
+  \ENDFOR
+  \RETURN $C$
+  \caption{Reduction algorithm by word (one bit at a time) (Hankerson).}
+  \label{alg:wordbit:hankerson}
+\end{algorithmic}
+\end{algorithm}
+
+\subsection{Word operation of the case $a=1$}\label{sec:word:operation:alg:a1}
+Figure \ref{fig:word:operation:alg:a1} is a representation of the case $a=1$ and $(m-1) \mod{W} > \frac{W}{2}$. In the figure, $D$ is the element to be reduced, $D_a$ are the bits reduced by the exponent $a$ and $D_0$ are the bits reduced by $0$. $D_{Red} = D \BitXOR D_a \BitXOR D_0$ is the reduced element. The hatched bits (shaded in figure) should be set to 0.
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width = \columnwidth]{figures/two-elements-reduction-a-1.pdf}
+\caption{Word operation of the case $a=1$.}
+\label{fig:word:operation:alg:a1}
+\end{figure}
+\\
+
+\begin{algorithm}
+  \begin{algorithmic}[1]
+  \REQUIRE $D[2t-1,0]$,$t$, $m$, $W$
+  \ENSURE $D_{Red = D[t-1,0]}$
+  \STATE $u \gets tW - m$
+  \STATE $h \gets W - u$
+  \STATE $T \gets D[t-1] \ShiftRight h$
+  \STATE $D[0] \gets D[0] \oplus T \oplus (D[t] \ShiftLeft u) \oplus (T \ShiftLeft 1) \oplus (D[t] \ShiftLeft (u+1)$ \label{alg:a1:high:primeira-linha}
+  \FOR{$i \gets 1$ \textbf{to} $t-2$}
+    \STATE $D[i] \gets D[i] \oplus (D[i+t-1] \ShiftRight h) \oplus (D[i+t-1] \ShiftRight (h-1)) \oplus (D[i+t] \ShiftLeft u) \oplus (D[i+t] \ShiftLeft (u+1))$
+    \ENDFOR
+  \STATE $T \gets D[2t-1] \ShiftLeft (2u+1)$\ \COMMENT{This avoid using \& to reset unused bits}
+  \STATE $D[t-1] \gets D[t-1] \oplus (D[2t-2] \ShiftRight h) \oplus (D[2t-2] \ShiftRight (h-1)) \oplus (T \ShiftRight u) \oplus (T \ShiftRight (u+1))$
+  \RETURN $D_{Red}$
+  \caption{Reduction algorithm by word for $x^m + x + 1$, from $D[2t-1]$.}
+  \label{alg:word:a1:high}
+\end{algorithmic}
+\end{algorithm}
+
+We have $4$ XORs in line \ref{alg:a1:high:primeira-linha}, $4(t-2)$ XORs in line 5, and $4$ XORs in line 8. The total is $$N_\oplus = 4t.$$
+
+We have $$N_{Shifts} = 4t.$$
+
+Now, we have the case where $(m-1) \mod{W} \leq \frac{W}{2}$. In this case, $D[2t-2]$ is not used as show in Figure \ref{fig:word:operation:alg:a1:low}. Thus, the algorithm procede to reduce the bits from $D[2t-1]$. The Algorithm is show in \ref{alg:word:a1:low}.
+
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width = \columnwidth]{figures/two-elements-reduction-a-1-low.pdf}
+\caption{Word operation of the case $a=1$ where $D[2t-1]$ is unused.}
+\label{fig:word:operation:alg:a1:low}
+\end{figure}
+
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width = \columnwidth]{figures/reduction-equally-spaced.pdf}
+\caption{Word operation of the Algorithm \ref{alg:equallyspaced:word:operation} where $D[2t-1]$ is used.}
+\label{fig:word:operation:alg:a1:low2}
+\end{figure}
+
+\begin{algorithm}
+  \begin{algorithmic}[1]
+  \REQUIRE $D[2t-2,0]$,$t$, $m$, $W$
+  \ENSURE $D_{Red = D[t-1,0]}$
+  \STATE $u \gets tW - m$
+  \STATE $h \gets W - u$
+  \STATE $T \gets D[t-1] \ShiftRight h$
+  \STATE $D[0] \gets D[0] \oplus T \oplus (D[t] \ShiftLeft u) \oplus (T \ShiftLeft 1) \oplus (D[t] \ShiftLeft (u+1)$ \label{alg:a1:low:primeira-linha}
+  \FOR{$i \gets 1$ \textbf{to} $t-3$}
+    \STATE $D[i] \gets D[i] \oplus (D[i+t-1] \ShiftRight h) \oplus (D[i+t-1] \ShiftRight (h-1)) \oplus (D[i+t] \ShiftLeft u) \oplus (D[i+t] \ShiftLeft (u+1))$
+    \ENDFOR
+  \STATE $T \gets D[2t-2] \ShiftLeft (2u+1-W)$\ \COMMENT{This avoid using \& to reset unused bits}
+  \STATE $D[t-2] \gets D[t-2] \oplus (D[2t-3] \ShiftRight h) \oplus (D[2t-3] \ShiftRight (h-1)) \oplus (T \ShiftRight u) \oplus (T \ShiftRight (u+1))$
+  \RETURN $D_{Red}$
+  \caption{Reduction algorithm by word for $x^m + x + 1$, from $D[2t-2]$.}
+  \label{alg:word:a1:low}
+\end{algorithmic}
+\end{algorithm}
+
+We have $4$ XORs in line \ref{alg:a1:low:primeira-linha}, $4(t-3)$ XORs in line 5, and $4$ XORs in line 8. The total is $$N_\oplus = 4t-4.$$
+
+We have $$N_{Shifts} = 4t-4.$$
+
+\subsection{Word operation of the case $a<m/2$}\label{sec:word:operation:alg:a2}
+Figure \ref{fig:word:operation:alg:a2} is a representation of the case $a<m/2$. In the figure, $D$ is the element to be reduced, $D_a$ are the bits reduced by the exponent $a$ and $D_0$ are the bits reduced by $0$. $D_{Red} = D \BitXOR D_a \BitXOR D_0$ is the reduced element. The hatched bits (shaded in figure) should be set to 0.
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width = \columnwidth]{figures/two-elements-reduction-a-6.pdf}
+\caption{Word operation of the case $a<m/2$.}
+\label{fig:word:operation:alg:a2}
+\end{figure}
+\\
+
+\subsection{Word operation of the  Algorithm~\ref{alg:esp}}\label{sec:word:operation:alg:esp}
+Figure \ref{fig:word:operation:alg:esp} is a representation of the algorithm \ref{alg:esp}. In the figure, $D$ is the element to be reduced, $D_a$ are the bits reduced by the exponent $a$ and $D_0$ are the bits reduced by $0$. $D_{Red} = D \BitXOR D_a \BitXOR D_0$ is the reduced element. The hatched bits (shaded in figure) should be set to 0.
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width = \columnwidth]{figures/two-elements-reduction-a-11.pdf}
+\caption{Word operation of the Algorithm \ref{alg:esp}.}
+\label{fig:word:operation:alg:esp}
+\end{figure}
+\\

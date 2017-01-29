@@ -1,0 +1,22 @@
+Operating on words
+
+- Requires reasoning
+- Explains complexity, slowdown, trying to hit both HW and SW, alignment, inter-word XOR, other bitwise operations
+
+\section{Operating on words}\label{operating-on-words}
+
+Manipulation of individual bits is not efficient in most CPU architectures. In general, it is preferred to operate on words, with a size specific to the microprocessor architecture, such as $32$- or $64$-bit words.  However, the reduction algorithms are strongly bit oriented. The codification of these algorithms to word oriented programming languages usually add some complexity in terms of new operations. Specific techniques that help us in this coding have been proposed in the literature\cite{Hilewitz2008}. 
+
+In this scenario it's often desirable to have "interoperability", choosing irreducible polynomials that behave well
+in both hardware and software implementations. A straightforward
+approach to this problem is to develop a hardware implementation first,
+XOR'ing individual bits, and convert the algorithm to words. This can be
+thought of as parallelizing the operations, with SHIFTs and AND/OR masks
+for alignment. This is the approach used in this document. {[}more
+formalization? references of other similar approaches?{]}
+
+The difficulty of the conversion process greatly varies depending on the
+access pattern of the algorithm and alignment of words. If all coefficients inside a range are
+XOR'ed once in a linear fashion, the XOR distance a multiple of the word size, and the start and end range lie in word boundaries, the converted algorithm gains a full
+speedup of up to \texttt{WORD\_SIZE} times
+{[}$C_{word} = \ceil*{\frac{C_{bit}}{W}}${]}.

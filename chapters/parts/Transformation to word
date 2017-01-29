@@ -1,0 +1,121 @@
+Transformation to word
+
+\subsection{Word operation of the  Algorithm~\ref{alg:general:bit:operation}}\label{sec:word:operation}
+
+The word-oriented versions of the algorithm can be created by noticing the bit access pattern. The XOR operation pattern can be thought of XORing two ranges
+
+Each of them perform a XOR operation between all bits in a certain range and counterparts a fixed distance away. This access pattern allows word-level parallelism. There are four issues that need to be paid attention to:
+
+\textbf{Misaligned start:}
+The loop starts at $2m -2$, which may not align with the word length ($W \nmid 2m-2$). To avoid overwriting the upper bits of this incomplete word we must clear them from the \texttt{src} word.
+
+\textbf{Misaligned ends:}
+The fix is identical to the misaligned start, where we clear the extra bits from the incoming word.
+
+\textbf{Misaligned source:}
+The source/incoming word may not be aligned to word boundaries either. In this case we need to pull bits from the next word too, shifting both of them for correct placement. Unfortunately this issue affects the start and ends word too, further complicating their treatment.
+
+\textbf{Too small distances:}
+Finally, if the distance between the XOR'ed words ($m-a$, $m$, respectively) is smaller than $W/2$, the same bit will be written and read in the same word-step. This is not possisble with a single operation, and requires handling each word in mulitple parts. This is suboptimal and should be avoided by better choices of $m$, $a$ and $W$.
+
+Other bit-level operations are emulated with word masks and shifts.
+
+To help transforming an algorithm in its word-parallel version we introduce the following helper functions. Notice the function calls can be inlined and all conditionals are open for static analysis (the final algorithm should contain no conditionals if optimized properly).
+
+\begin{algorithm}
+\begin{algorithmic}[1]
+  \REQUIRE $dst$, $src$, $W$, $C[]$
+  \STATE $mask \gets 1 << (src \mod W)$
+  \STATE $C[dst / W] \gets C[dst / W] \oplus (C[src / W] \land mask) << (dst \mod W - src \mod W)$
+  \caption{\texttt{XOR\_BIT}: Single bit XOR inside word}
+\end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}
+\begin{algorithmic}[1]
+  \REQUIRE $dst$, $src$, $W$, $C[]$
+  \STATE $left \gets C[src / W] >> (src \mod W)$
+  \STATE $right \gets C[src / W + 1] << (W - src \mod W)$
+  \STATE $C[dst / W] \gets C[dst / W] \oplus (left \lor right)$
+  \caption{\texttt{XOR\_WORD}: Whole word XOR with possibly misaligned source}
+\end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}
+\begin{algorithmic}[1]
+  \REQUIRE $dst$, $src$, $n\_bits$, $W$, $C[]$
+  \STATE $shift \gets src \mod W$
+  \STATE $left\_n\_bits \gets \min(n\_bits, W - shift)$
+  \STATE $leftmask \gets ((1 << left\_n\_bits) - 1) << shift$
+  \STATE $left \gets (C[src / W] \land leftmask) >> shift$
+  \STATE $right\_n\_bits \gets n\_bits - left\_n\_bits$
+  \IF{$right\_n\_bits > 0$}
+    \STATE $rightmask \gets (1 << right\_n\_bits) - 1$
+    \STATE $right \gets (C[src/W+1] \land rightmask) << left\_n\_bits$
+  \ELSE
+    \STATE $right \gets 0$
+  \ENDIF
+  \STATE $C[dst/W] = C[dst/W] \oplus ((left | right) << (dst \ W))$
+  \caption{\texttt{XOR\_PARTIAL\_WORD}: XOR a range of bits inside a word, with possibly misaligned source}
+\end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}
+\begin{algorithmic}[1]
+  \REQUIRE $start\_dst$, $end\_dst$, $distance$, $W$, $C[]$
+  \IF{$end\_dst/W = start\_dst/W$}
+    \STATE \texttt{XOR\_PARTIAL\_WORD}($start\_dst$, $start\_dst + distance$, $end\_dst - start\_dst$, $W$, $C$)
+  \ELSE
+    \IF{$start\_dst \ W \neq 0$}
+      \STATE $remaining = W - (start\_dst \ W)$
+      \STATE \texttt{XOR\_PARTIAL\_WORD}($start\_dst$, $start\_dst + distance$, $remaining$, $W$, $C$)
+      \STATE $start\_dst \gets start\_dst + remaining$
+    \ENDIF
+    
+    \STATE $rounded\_end \gets (end\_dst / W) * W$
+    \STATE $dst \gets start\_dst$
+    \WHILE{$dst < rounded\_end$}
+      \STATE \texttt{XOR\_WORD}($dst$, $dst + distance$, $W$, $C$)
+      \STATE $dst \gets dst + W$
+    \ENDWHILE
+    
+    \IF{$end\_dst \ W \neq 0$}
+      \STATE \texttt{XOR\_PARTIAL\_WORD}($rounded\_end$, $rounded\_end + distance$, $end\_dst \ W$, $W$, $C$)
+    \ENDIF
+  \ENDIF
+  \caption{\texttt{XOR\_RANGE}: XOR a range of bits (across many words) with an equivalent range a certain distance away}
+\end{algorithmic}
+\end{algorithm}
+
+
+And the word-transformed algorithms are:
+
+\begin{algorithm}
+\begin{algorithmic}[1]
+  \REQUIRE $m$, $a$, $W$, $C\left[0,\ceil*{\frac{2m-2}{W}}\right]$
+  \ENSURE $C[0,m-1]$
+  \STATE \texttt{XOR\_RANGE}($a$, $a+m$, $m$, $W$, $C$)
+  \STATE \texttt{XOR\_RANGE}($0$, $a-1$, $m$, $W$, $C$)
+  \RETURN $C$
+  \caption{Simple word-parallel reduction algorithm for $x^m + x^a +1$, $a = \frac{m}{2}$}
+  \label{alg:equallyspaced:word:operation}
+\end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}
+\begin{algorithmic}[1]
+  \REQUIRE $m$, $a$, $W$, $C\left[0,\ceil*{\frac{2m-2}{W}}\right]$
+  \ENSURE $C[0,m-1]$
+  \STATE $start\_src \gets m$
+  \STATE $step\_size \gets m - a$
+  \WHILE{$start\_src \le 2m - 2$}
+    \STATE \texttt{XOR\_RANGE}($a$, $a + 2m-2 - start\_src$, $start\_src - a$, $W$, $C$)
+    \STATE $start\_src \gets start\_src + step\_size$
+    \STATE $step\_size \gets 2 \times step\_size$
+  \ENDWHILE
+  \STATE \texttt{XOR\_RANGE}($0$, $m$, $m$, $W$, $C$)
+  \RETURN $C$
+  \caption{Alternative reduction algorithm, uses more XORs but less calls to \texttt{XOR\_RANGE}, may be useful for certain architectures.}
+  \label{alg:new:word:operation}
+\end{algorithmic}
+\end{algorithm}

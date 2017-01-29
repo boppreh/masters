@@ -1,0 +1,5 @@
+Word processing chapter introduction
+
+During our research we also studied $GF(2^m)$ arithmetic for CPUs, where the coefficient bits are grouped into words. Because this introduces new layer of complexity, we decided to focus on the relatively niche of polynomial reduction modulo a trinomial, a common operation in $\F_2[x]/(x^m+x^a+1)$.
+
+This operation has some important practical applications. Ussing a trinomial as irreducible polynomial is  preferred when available because it maximizes the number of zero coefficients in the the irreducible polynomial, enabling numerous simplifications. And the reduction operation is an important step for multiplications and exponentiations, making speedups desirable.

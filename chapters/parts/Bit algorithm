@@ -1,0 +1,155 @@
+Bit algorithm
+
+\section{Bit operation reduction algorithms}\label{sec:bit:operation}
+This section presents bit operation reduction algorithms for trinomials. The algorithms depend on the number of reduction steps given by Eq.~\ref{eq:k}. As $k$ increases, more steps can be required to perform the reduction. The equation $x^{m+j} \equiv x^{a+j} + x^j mod (x^m+x^a+1)$ is used to replace each coefficient at or over $m$ with a smaller one, reducing the polynomial. The Algorithm \ref{alg:bits} shows this reduction process. 
+
+\begin{algorithm}
+\begin{algorithmic}[1]
+  \REQUIRE $a$, $C[2m-2,0]$
+  \ENSURE $C[m-1,0]$
+  \STATE $k \gets \left \lfloor \frac{m-2}{m-a} \right \rfloor + 1$
+  \STATE $r \gets 0$
+  \FOR{$i \gets 1$ \textbf{to} $k$}
+    \STATE $r \gets r + (m-a)$
+    \FOR{$j \gets 0$ \textbf{to} $m-1-r$}
+      \STATE $C[j] \gets C[j] \oplus C[j+a+r]$
+      \ENDFOR
+    \FOR{$j \gets a$ \textbf{to} $m-1$}
+      \STATE $C[j] \gets C[j] \oplus C[j+r]$
+      \ENDFOR
+    \ENDFOR
+  \RETURN $C$
+  \caption{General reduction algorithm processed by bit, taken directly from equation 5 (update).}
+  \label{alg:bits}
+\end{algorithmic}
+\end{algorithm}
+
+However this algorithm introduces a number of repeated bit operations. Some of these operations could be canceled, and others could be grouped, so that they can be made once and reused when necessary.
+
+We propose a general algorithm for all possible values of $a$, and one for the special case $m=2a$. This is known in literature as Equally Spaced Polynomials. For comparison reasons we introduce instantiated algorithms for $a = 1$ and $a = m-1$, which are usually treated as special cases in the literature.
+
+\subsection{Case $(m-a) \mid a$}
+
+Situations where $m-a$ divides $a$ result in cancelled items, coefficients that are XORed twice to the same bit. The most visible case is when $m-a = a$, the equally-spaced trinomial. In this case, the cancelled items translate directly to cancelled operations, and the reduction can be performed in less steps.
+
+Other cases can be found by using the formula $a = \frac{\alpha}{\alpha + 1}m$ with $a, \alpha \in \mathbb{Z}^{+}$ [I think it should be $\mathbb{N}$, Custodio disagrees]. The equally spaced case happens when $\alpha = 1$. As an example of other cases, $x^{20}+x^{15}+1$, $x^{20}+x^{16}+1$ and $x^{20}+x^{18}+1$ all contain some cancellations. The number of XOR cancellations is $m - a - 1$, which explains the complexity of $\frac{3}{2}m - 3$ for the equally-spaced case. It's still an open problem if the non-equally spaced case can be optimized at all.
+
+\subsection{Case $a=1$}
+When $a=1$, the number of reduction steps given by the Eq.~\ref{eq:k} is $$k=\left \lfloor \frac{m-2}{m-a} \right \rfloor + 1=\left \lfloor \frac{m-2}{m-1} \right \rfloor + 1=1.$$ This is the simplest case. The number of XOR operations is $N_\oplus = 2m-2$.
+
+ \begin{algorithm}
+ \begin{algorithmic}[1]
+  \REQUIRE $m$, $C[2m-2,0]$
+  \ENSURE $C[m-1,0]$
+  \FOR{$i \gets m-2$ \textbf{downto} $0$}
+      \STATE $C[i+1] \gets C[i+1] \oplus C[i+m]$
+      \STATE $C[i] \gets C[i] \oplus C[i+m]$
+  \ENDFOR
+  \RETURN $C$
+  \caption{Simple reduction algorithm for $x^m + x + 1$, $a = 1$}
+  \label{alg:a1:bit:operation}
+\end{algorithmic}
+\end{algorithm}
+
+Algorithm \ref{alg:a1:bit:operation}  uses $2m - 2$ operations and has a depth of only 2. This is the best possible case for a bit-parallel circuit.
+
+\subsection{Case $ 1 < a < \frac{m}{2}$}
+The number of reduction steps given by the Eq.~\ref{eq:k} is $$k=\left \lfloor \frac{m-2}{m-a} \right \rfloor + 1=2.$$ The number of XOR operations is $N_\oplus = 2m-2$.
+
+\subsection{Case $m=2a$}
+The special case where $m=2a$ operation algorithm is presented in Algorithm~\ref{alg:esp}. This algorithm, known in literature as Equally Spaced Trinomial, is essentially the same stated by Wu\cite[p. 753, Eq. 3]{Wu2002}. There, however, it used different vectors: one for the element to be reduced and other for the result itself. The number of reduction steps given by the Eq.~\ref{eq:k} is $$k=\left \lfloor \frac{m-2}{m-a} \right \rfloor + 1=\left \lfloor \frac{2a-2}{2a-a} \right \rfloor + 1=\left \lfloor \frac{2a-2}{a} \right \rfloor + 1=2.$$ 
+
+\ref{alg:equallyspaced:bit:operation} is a $m=2a$ version of algorithm \ref{alg:general:bit:operation} with cancellations. It is trivial to see that its complexity is $m + a - 1$, or, since $a = m/2$, the number of operations is exactly $\frac{3}{2}m - 1$.
+
+\begin{algorithm}
+\begin{algorithmic}[1]
+  \REQUIRE $a$, $C[0,2m-2]$
+  \ENSURE $C[m-1,0]$
+  \FOR{$i \gets 0$ \textbf{to} $m-2$}
+    \STATE $C[i+a] \gets C[i+a] \oplus C[i+m]$
+    \ENDFOR
+  \FOR{$i \gets a - 1$ \textbf{to} $0$}
+    \STATE $C[i] \gets C[i] \oplus C[i+m]$
+    \ENDFOR
+  \RETURN $C$
+  \caption{Simple Reduction algorithm for $x^{m} + x^a +1$, $a = \frac{m}{2}$.}
+  \label{alg:equallyspaced:bit:operation}
+\end{algorithmic}
+\end{algorithm}
+
+\subsubsection{Proof}
+
+Applying the equation of maximum number of reduction steps, by Sunar and Ko\c{c} \cite{SunarKoc}, to the equally spaced case we arrive at
+
+\begin{equation}
+  k = \left \lfloor \frac{m-2}{m-\frac{m}{2}} \right \rfloor + 1 = 2
+\end{equation}
+
+Therefore the reduction equation is comprised of two steps. Since $(x^m)^n = (x^a + 1)^n$, the full reduction formula for the equally spaced trinomial is:
+
+\begin{gather}
+    \sum_{i = 0}^{m-1}{c_i x^i} +
+        \sum_{j = 0}^{\frac{m}{2} - 2}{c_{j + m} x^j} +
+        \sum_{j = 0}^{m - 2}{c_{j + m} x^{j+\frac{m}{2}}} +
+        \sum_{j = 0}^{\frac{m}{2} - 2}{c_{j + m + a} x^j}
+\end{gather}
+
+Lines 1 and 2 of algorithm \ref{alg:equallyspaced:bit:operation} correspond to the first reduction step for $x^a$ (last summation). Lines 3 and 4 correspond truncated first step for $x^0$ (second summation). And because of the mutable nature of the data structure, lines 3 and 4 operate on bits that were already XOR'ed in the first loop. This overlap gives raises to the remaining $a$ elements of the second reduction step for $x^0$ (third summation).
+
+End of proof.
+
+\begin{algorithm}
+\begin{algorithmic}[1]
+  \REQUIRE $a$, $C[4a-2,0]$
+  \ENSURE $C[2a-1,0]$
+  \FOR{$i \gets 0$ \textbf{to} $a-2$}
+    \STATE $C[i] \gets C[i] \oplus C[i+2a] \oplus C[i+3a]$
+    \ENDFOR
+  \STATE $C[a-1] \gets C[a-1] \oplus C[3a-1]$ 
+  \FOR{$i \gets a$ \textbf{to} $2a-1$}
+    \STATE $C[i] \gets C[i] \oplus C[i+a]$
+  \ENDFOR
+  \RETURN $C$
+  \caption{Reduction algorithm for $x^{m} + x^a +1$, $m=2a$.}
+  \label{alg:esp}
+\end{algorithmic}
+\end{algorithm}
+
+\subsection{Case $a=m-1$}
+The special case where $a=m-1$ operation algorithm is presented in Algorithm~\ref{alg:ma1}. This algorithm has the same complexity as the general algorithm, i.e, $N_\oplus = 2m-2$. The number of reduction steps given by the Eq.~\ref{eq:k} is $$k=\left \lfloor \frac{m-2}{m-a} \right \rfloor + 1 = \left \lfloor \frac{m-2}{m-(m-1)} \right \rfloor + 1 = \left \lfloor m-2 \right \rfloor + 1=m-1.$$
+
+\begin{algorithm}
+\begin{algorithmic}[1]
+  \REQUIRE $a$, $C[2m-2,0]$
+  \ENSURE $C[m-1,0]$
+  \FOR{$i \gets 2m-3$ \textbf{downto} $m$}
+    \STATE $C[i] \gets C[i] \oplus C[i+1]$
+    \ENDFOR
+  \STATE $C[a] \gets C[a] \oplus C[m]$ 
+  \FOR{$i \gets 0$ \textbf{to} $m-2$}
+    \STATE $C[i] \gets C[i] \oplus C[i+m]$
+  \ENDFOR
+  \RETURN $C$
+  \caption{Reduction algorithm for $x^{m} + x^a +1$, $a=m-1$.}
+  \label{alg:ma1}
+\end{algorithmic}
+\end{algorithm}
+
+\subsection{First General case for $1 \leq a < m$}
+The general bit operation algorithm is presented in Algorithm~\ref{alg:general:bit:operation}.
+
+\begin{algorithm}
+\begin{algorithmic}[1]
+  \REQUIRE $m$, $a$, $C[2m-2,0]$
+  \ENSURE $C[m-1,0]$
+  \FOR{$i \gets m-2$ \textbf{downto} $0$}
+      \STATE $C[i+a] \gets C[i+a] \oplus C[i+m]$
+      \STATE $C[i] \gets C[i] \oplus C[i+m]$
+  \ENDFOR
+  \RETURN $C$
+  \caption{Simple reduction algorithm for $x^m + x^a +1$, $m \not = 2a$}
+  \label{alg:general:bit:operation}
+\end{algorithmic}
+\end{algorithm}
+
+This algorithm obviously uses $2 (m - 1) = 2m -2$ XORs.

@@ -1,0 +1,9 @@
+Choice of $a$
+
+\section{Choice of $a$}
+
+The choice of the second coefficient $a$ directly affects the performance characteristics of reduction algorithms. Several factors are at play:
+
+If $m-a < W$ software implementations will be less efficient. This is because there will be XOR operations inside words, and the operations can not be performed with full word-sized XORs.
+
+The alignment of $a$ and $m-a$ with relation to $W$ define if word-sized XORs will require bits of two words in the source or in the destination. Thus alignment can halve the number of operations involved.
