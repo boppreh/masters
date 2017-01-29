@@ -1,0 +1,133 @@
+ufscThesis - Template LaTeX 
+----------------------------
+
+IMPORTANTE!!!
+
+LEIA ESTE DOCUMENTO ANTES DE TENTAR USAR O TEMPLATE!!!
+
+
+Sobre o ufscThesis
+------------------
+O ufscThesis é um template LaTeX para a elaboraçăo de trabalhos acadęmicos
+no formato definido pela Biblioteca Universitária da Universidade Federal
+de Santa Catarina.
+
+O template foi criado a partir da necessidade identificada por parte
+dos pós-graduandos usuários de LaTeX, que năo contavam com classes de 
+documentos similares quanto ŕ geometria das páginas.
+
+Os autores săo Roberto Simoni e Carlos R Rocha, ambos pós-graduandos em
+Engenharia Mecânica da UFSC no momento em que a primeira versăo do 
+template foi colocada para testes.
+
+Esta é uma versăo inicial do template. Apesar de testado para a elaboraçăo
+de teses e ter pelo menos uma tese aprovada e disponibilizada na BU feita
+com o ufscThesis, entende-se que ainda é possível aparecer situaçőes em
+que o documento gerado apresente alguma discrepância em relaçăo ŕ norma
+da BU/UFSC. Isso é normal para qualquer implementaçăo inicial, e pede-se
+aos usuários que comuniquem ŕ BU essas năo conformidades
+quando e se aparecerem.
+
+Este template está disponível através de licença GPL. Para maiores
+informaçőes, acesse http://www.gnu.org/licenses/gpl.html
+
+
+Pré-requisitos
+--------------
+Como a norma da BU/UFSC é baseada nas normas ABNT, o ufscThesis usa o 
+template ABNTeX como base, modificando-o onde a norma da BU/UFSC difere
+da ABNT.
+
+Isso significa que é necessário ter o ABNTeX instalado na sua distribuiçăo
+LaTeX. Informaçőes e download do ABNTeX estăo disponíveis no sítio
+eletrônico do projeto: http://abntex.codigolivre.org.br/
+
+Usuários de LaTeX em distribuiçőes linux podem ter o ABNTeX disponível
+como um pacote no repositório (por exemplo, Ubuntu). Em outros casos, o
+usuário terá de ver como instalar o ABNTeX em seu LaTeX.
+
+A versăo de ABNTeX sobre a qual o ufscThesis foi construida foi a 0.8.2,
+considerada a última estável. É possível que sua distribuiçăo de LaTex
+utilize versőes posteriores, como a 0.9.x, que ainda estăo em estágio de
+desenvolvimento. Isso pode causar diferenças de fontes e formataçăo de
+parágrafo. Podem ser definidos parâmetros no documentclass que reduzam
+estes problemas.
+
+Dentro do pacote do ufscThesis há um arquivo comprimido contendo o ABNTeX
+0.8.2, para o caso do usuário năo encontrar uma instalaçăo. Recomenda-se
+seguir as instruçőes de instalaçăo específicas do ABNTeX.
+
+O ufscThesis já foi utilizado em distribuiçőes de LaTeX como o texlive
+(linux) e o MiKTeX (windows). Se vocę utiliza outra distribuiçăo de LaTeX
+e conseguiu trabalhar com o ufscThesis, por favor informe para atualizar
+o banco de informaçőes.
+
+Instalaçăo e Uso
+----------------
+Por ser uma versăo incial, o ufscThesis năo tem instalador. Para deixá-lo 
+em condiçőes de uso, basta descomprimir o arquivo ufscThesis.zip em uma
+pasta qualquer. A pasta em que ele foi descomprimido passará a ser a pasta
+raiz do trabalho científico que vocę redigirá.
+
+Vocę encontrará 4 arquivos relevantes no ufscThesis:
+
+- tutorial.tex : exemplo de uso do ufscThesis. Vocę pode utilizar ele como
+                 base do seu trabalho científico, apagando o texto presente
+				 dentro do documento, mas aproveitando as suas definiçőes.
+- ufscThesis.cls : Esta é a classe de documento que define a formataçăo e o
+                   comportamento do ufscThesis. Vocę năo deve alterar este
+				   arquivo a năo ser que conheça como elaborar classes de 
+				   documento no LaTeX.
+- BUUFSCThesis.sty : Arquivo de estilo que contém os textos usados para gerar
+                     os elementos pré-textuais, principalmente. Evite alterar
+					 este arquivo, a năo ser que năo exista outra maneira de
+					 gerar o elemento pré-textual a partir dos comandos nos
+					 arquivos do seu trabalho científico.
+- ufsc-alf.bst : Arquivo de formataçăo de referęncias bibliográficas. Este é
+                 uma adaptaçăo dos formatadores do ABNTeX, visando atualizar
+				 a classe de documento em relaçăo ŕ ABNT. Năo altere este
+				 arquivo a năo ser que saiba trabalhar com este formatador de
+				 referęncias. Se conseguir aperfeiçoa-lo, por favor, dę o
+				 devido retorno, para melhorarmos o template e disponibilizarmos
+				 ŕ comunidade acadęmica.
+                 
+Como foi dito, basta descomprimir o arquivo .zip e começar a utilizar. Um
+exemplo de uso consiste no arquivo tutorial.tex. Uma sugestăo para iniciar o
+seu trabalho é justamente copiar ou renomear este arquivo e sobrescrever o seu
+conteúdo com a redaçăo do seu trabalho científico. Há vários comentários neste
+arquivo detalhando o uso dos campos de definiçăo de dados para os elementos 
+pré-textuais e como gerá-los. Sugere-se que o usuário do template iniciante
+analise primeiro estes dados, antes de começar a utilizar sem saber o que está
+fazendo.
+
+O texto do tutorial.tex foi retirado de um tutorial para elaboraçăo de trabalhos
+para o XX Congresso Internacional de Engenharia Mecânica, que ocorreu em 2009 na
+cidade de Gramado(RS). O texto năo contém nenhuma informaçăo relevante para o
+template em si, servindo apenas para verificar se a formataçăo gerada pelo
+ufscThesis está de acordo com as normas da BU/UFSC.
+
+Comentários Finais
+------------------
+Este template foi elaborado para utilizaçăo livre de toda a comunidade acadęmica
+da UFSC e outros interessados. Os usuários podem copiar, estudar, analisar, 
+modificar e repassar as alteraçőes para os demais usuários, desde que mantenham
+os créditos dos autores da versăo original, conforme diz a licença GPL.
+
+Reiteramos que é possível que apareçam alguns problemas decorrentes de situaçőes
+năo testadas na elaboraçăo de trabalhos acadęmicos. Se este for o caso, por favor
+comunique. Se conseguir solucionar um problema encontrado, repasse para os
+autores, para que possa ser sanado em atualizaçőes do template e assim beneficie
+os demais usuários.
+
+Os autores deste template o fizeram por necessidade própria de redaçăo de suas
+teses. A disponibilizaçăo para a comunidade acadęmica foi feita no sentido de 
+colaboraçăo. Atualizaçőes serăo feitas de acordo com o tempo disponível dos
+autores ou seus associados para trabalhar no template. Isso posto, espera-se 
+que os usuários entendam que năo serăo fornecidos atendimentos personalizados,
+năo serăo respondidas dúvidas sobre o uso de LaTeX ou outros assuntos que năo
+estejam diretamente relacionados com o template ufscThesis.
+
+Para um futuro próximo, espera-se criar um FAQ list com as principais dúvidas
+de elaboraçăo dos trabalhos acadęmicos com o ufscThesis e um gerador de capas.
+
+

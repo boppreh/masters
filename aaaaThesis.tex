@@ -1,0 +1,248 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Universidade Federal de Santa Catarina             
+% Biblioteca Universitária                     
+%                                                           
+% (c)2010 Roberto Simoni (roberto.emc@gmail.com)
+%         Carlos R Rocha (cticarlo@gmail.com)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\PassOptionsToPackage{abnt-etal-cite=1, abnt-etal-list=0}{abntcite}
+\documentclass{ufscThesis}
+
+\usepackage[page]{appendix}
+
+%\usepackage{cite}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage[utf8]{inputenc}
+\usepackage{algorithmic}
+\usepackage{algorithm}% http://ctan.org/pkg/algorithms
+\usepackage{multicol}
+\usepackage{amsthm}
+
+\usepackage{mathtools}
+\DeclarePairedDelimiter{\ceil}{\lceil}{\rceil}
+\DeclarePairedDelimiter{\floor}{\lfloor}{\rfloor}
+\newcommand{\minuseq}{\mathrel{{-}{=}}}
+\newcommand{\F}{\mathbb{F}}
+\newcommand{\primes}{\mathbb{P}}
+\newcommand{\weight}[1]{\text{weight}({#1})}
+
+\renewcommand{\algorithmicrequire}{\textbf{Input:}}
+\renewcommand{\algorithmicensure}{\textbf{Output:}}
+\renewcommand{\algorithmicforall}{\textbf{for each}}
+
+\newcommand{\mathbox}[3][l]{\makebox[\widthof{$#2$}][#1]{$#3$}}
+
+% From Elsevier class.
+\newtheorem{thm}{Theorem}
+\newtheorem{lem}[thm]{Lemma}
+%\newdefinition{rmk}{Remark}
+%\newproof{pf}{Proof}
+%\newproof{pot}{Proof}
+
+\newcommand{\specialcell}[2][c]{%
+  \begin{tabular}[#1]{@{}l@{}}#2\end{tabular}}
+
+% Without this the superscripts get too close to the upper line.
+\renewcommand{\arraystretch}{1.2}
+\setlength\tabcolsep{5mm}
+
+\usepackage [english]{babel}
+\usepackage [autostyle, english = american]{csquotes}
+\MakeOuterQuote{"}
+
+
+\newcommand{\ftwo}{{\mathbb F}_{2}}
+\newcommand{\ftwom}{{\mathbb F}_{2^m}}
+\newcommand\Tstrut{\rule{0pt}{2.1ex}}  
+
+\newcommand{\rmv}[1]{}
+
+\newcommand*\BitAnd{\mathrel{\&}}
+\newcommand*\BitOr{\mathrel{|}}
+\newcommand*\BitXOR{\mathrel{\oplus}}
+\newcommand*\ShiftLeft{\ll}
+\newcommand*\ShiftRight{\gg}
+\newcommand*\BitNeg{\ensuremath{\mathord{\sim}}}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Identificadores do trabalho
+% Usados para preencher os elementos pré-textuais
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% TODO: M mínusculo
+\titulo{Fast modular reduction \protect\\ and squaring in $GF(2^\MakeLowercase{m})$} % Titulo do trabalho
+%\subtitulo{Estilo \LaTeX~ padrăo}                % Subtitulo do trabalho (opcional)
+\autor{Lucas Boppre Niehues}           % Nome do autor
+\data{01}{Janeiro}{2017}                           % Data da publicaçăo do trabalho
+
+\orientador{Prof. Ricardo Felipe Custódio}                    % Nome do orientador e (opcional) seu título
+\coorientador{Prof. Daniel Panario}                % Nome do coorientador e seu título (opcional)
+\coordenador{Prof. Chefe, Carina Dorneles}              % Nome do coordenador do curso e (opcional) seu título
+
+\instituicao[o]{Universidade Federal de Santa Catarina}
+\departamento[a]{Departamento de Informática e Estatistica}
+\curso[o]{curso de Pós-Graduação em Ciência da Computação}
+\grau{Mestre em Ciência da Computação}
+\documento[a]{Dissertação}
+
+%%% Sobre a Banca
+\numerodemembrosnabanca{2} % Isso decide se haverá uma folha adicional
+%\orientadornabanca{sim} % Se faz parte da banca definir como sim
+%\coorientadornabanca{sim} % Se faz parte da banca definir como sim
+\bancaMembroA{Primeiro membro da banca} %Nome do presidente da banca %TODO
+\bancaMembroB{Segundo membro da banca}      % Nome do membro da Banca %TODO
+
+\textoResumo {Resumo em portugues} %TODO
+
+\palavrasChave {Corpos finitos, teoria de números, polinômios, squaring, criptografia.}
+
+\textAbstract {We present an efficient bit-parallel algorithm for squaring in $GF(2^m)$ using polynomial basis. This algorithm achieves competitive efficiency while being aimed at any choice of low-weight irreducible polynomial. For a large class of irreducible polynomials it is more efficient than the previously best general squarer. In contrast, other efficient squarers often require a change of basis or are suitable for only a small number of irreducible polynomials. Additionally, we present a simple algorithm for modular reduction with equivalent cost to the state of the art for general irreducible polynomials. This fast reduction is used in our squaring method.}
+
+\palavrasChave {Finite field, number theory, polynomial, squaring, cryptography.}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Início do documento                                
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+%--------------------------------------------------------
+% Elementos pré-textuais
+\capa  
+\folhaderosto % Se nao quiser imprimir a ficha, é só năo usar o parâmetro
+\folhaaprovacao
+\paginaresumo
+\paginaabstract
+\listadefiguras
+\listadetabelas 
+\listadeabreviaturas
+\listadesimbolos
+\sumario
+
+%Dissertação segundo papel de 2016/07/01
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%1. Introdução:
+%contexto
+%objetivo - específico
+%justificativa
+%motivação
+%conteúdo (na seção x...) 
+%
+%2. ref. teórico / introdução
+%o que o leitor precisa saber para entender a tua proposta
+%
+%3. Proposta / O que fez!
+%Artigo
+%
+%4. Disc. / Análise / comparação
+%Do que foi feito
+%
+%5. Considerações finais
+%Apanhado do que foi feito, linkado com objetivos específicos
+%trabalhos futuros
+%
+%referências
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Introduction}
+%\input{chapters/introduction}
+
+% Introdução a finite fields
+\chapter{Mathematical background}\label{cap:background}
+%\input{chapters/background}
+
+% Artigo rejeitado para IEEE (https://www.sharelatex.com/project/56e84e3540deb4e636bf5aab)
+\chapter{Reduction and Squaring in $GF(2^\MakeLowercase{m})$}
+%\input{chapters/reduction_squaring_2}
+
+% Parte de p-ésima potência do artigo submetido por último (https://www.sharelatex.com/project/5797e2f474f358335fdc55f5)
+\chapter{Generalized reduction and squaring in $GF(\MakeLowercase{p}^\MakeLowercase{m})$} \label{pth}
+%\input{chapters/reduction_squaring_p}
+
+% Technical report (https://www.sharelatex.com/project/55f7e238e04e2805561c2a10)
+\chapter{Word Processing}
+\input{chapters/word_processing}
+
+% "joguinho" boppreh.com
+\chapter{Visual debugger}
+%\input{chapters/visual_debugger}
+
+% Discutir as contribuições. O que foi trazido de melhorias? Avaliação do trabalho. Contextualizar a contribuição, com análise crítical.
+\chapter{Evalution?}
+%\input{chapters/evaluation}
+
+% Objetivos atingidos: específicos e gerais.
+% Propostas futuras.
+\chapter{Final considerations}
+%\input{chapters/final_considerations}
+
+
+
+
+\section{References}
+
+\bibliographystyle{ufsc-alf}
+\bibliography{aaabibliografia}
+
+\begin{appendices}
+
+\section{Example of resulting algorithm}
+\label{appendix:example}
+
+\begin{algorithm}
+\caption{Squaring for $\F_{2^{19}} \cong \F_2[x]/(x^{19} + x^5 + x^2 + x + 1)$}
+\label{alg:square:example}
+\begin{multicols}{2}
+\begin{algorithmic}[1]
+\REQUIRE $A = [a_0, a_1, a_2, ..., a_{18}]$, \\$f(x)~=~x^{19}~+~x^5~+~x^2~+~x~+~1$
+\ENSURE $A^2 \mod f$
+\STATE $C = [a_0, 0, a_1, 0, a_2, 0, \ldots, 0, a_{18}]$
+\STATE $\mathbox{C[22]}{C[22]} \leftarrow C[22]  \oplus  C[36]$
+\STATE $\mathbox{C[22]}{C[19]} \leftarrow C[36]$
+\STATE $\mathbox{C[22]}{C[18]} \leftarrow C[18]  \oplus  C[36]$
+\STATE $\mathbox{C[22]}{C[17]} \leftarrow C[36]$
+\STATE $\mathbox{C[22]}{C[20]} \leftarrow C[20]  \oplus  C[34]$
+\STATE $\mathbox{C[22]}{C[17]} \leftarrow C[17]  \oplus  C[34]$
+\STATE $\mathbox{C[22]}{C[16]} \leftarrow C[16]  \oplus  C[34]$
+\STATE $\mathbox{C[22]}{C[15]} \leftarrow C[34]$
+\STATE $\mathbox{C[22]}{C[18]} \leftarrow C[18]  \oplus  C[32]$
+\STATE $\mathbox{C[22]}{C[15]} \leftarrow C[15]  \oplus  C[32]$
+\STATE $\mathbox{C[22]}{C[14]} \leftarrow C[14]  \oplus  C[32]$
+\STATE $\mathbox{C[22]}{C[13]} \leftarrow C[32]$
+\STATE $\mathbox{C[22]}{C[16]} \leftarrow C[16]  \oplus  C[30]$
+\STATE $\mathbox{C[22]}{C[13]} \leftarrow C[13]  \oplus  C[30]$
+\STATE $\mathbox{C[22]}{C[12]} \leftarrow C[12]  \oplus  C[30]$
+\STATE $\mathbox{C[22]}{C[11]} \leftarrow C[30]$
+\STATE $\mathbox{C[22]}{C[14]} \leftarrow C[14]  \oplus  C[28]$
+\STATE $\mathbox{C[22]}{C[11]} \leftarrow C[11]  \oplus  C[28]$
+\STATE $\mathbox{C[22]}{C[10]} \leftarrow C[10]  \oplus  C[28]$
+\STATE $\mathbox{C[22]}{C[9]} \leftarrow C[28]$
+\STATE $\mathbox{C[22]}{C[12]} \leftarrow C[12]  \oplus  C[26]$
+\STATE $\mathbox{C[22]}{C[9]} \leftarrow C[9]  \oplus  C[26]$
+\STATE $\mathbox{C[22]}{C[8]} \leftarrow C[8]  \oplus  C[26]$
+\STATE $\mathbox{C[22]}{C[7]} \leftarrow C[26]$
+\STATE $\mathbox{C[22]}{C[10]} \leftarrow C[10]  \oplus  C[24]$
+\STATE $\mathbox{C[22]}{C[7]} \leftarrow C[7]  \oplus  C[24]$
+\STATE $\mathbox{C[22]}{C[6]} \leftarrow C[6]  \oplus  C[24]$
+\STATE $\mathbox{C[22]}{C[5]} \leftarrow C[24]$
+\STATE $\mathbox{C[22]}{C[8]} \leftarrow C[8]  \oplus  C[22]$
+\STATE $\mathbox{C[22]}{C[5]} \leftarrow C[5]  \oplus  C[22]$
+\STATE $\mathbox{C[22]}{C[4]} \leftarrow C[4]  \oplus  C[22]$
+\STATE $\mathbox{C[22]}{C[3]} \leftarrow C[22]$
+\STATE $\mathbox{C[22]}{C[6]} \leftarrow C[6]  \oplus  C[20]$
+\STATE $\mathbox{C[22]}{C[3]} \leftarrow C[3]  \oplus  C[20]$
+\STATE $\mathbox{C[22]}{C[2]} \leftarrow C[2]  \oplus  C[20]$
+\STATE $\mathbox{C[22]}{C[1]} \leftarrow C[20]$
+\STATE $\mathbox{C[22]}{C[5]} \leftarrow C[5]  \oplus  C[19]$
+\STATE $\mathbox{C[22]}{C[2]} \leftarrow C[2]  \oplus  C[19]$
+\STATE $\mathbox{C[22]}{C[1]} \leftarrow C[1]  \oplus  C[19]$
+\STATE $\mathbox{C[22]}{C[0]} \leftarrow C[0]  \oplus  C[19]$
+\RETURN $C[0],~C[1],~C[2],~\ldots,~C[18]$
+\end{algorithmic}
+\end{multicols}
+\end{algorithm}
+
+Algorithm~\ref{alg:square:example} is an instance of Algorithm~\ref{alg:square}, wherein the irreducible polynomial is defined as $x^{19}+x^5+x^2+x+1$ by simply fixing $f$. We note the circuit has a delay of $3T_X$, due to the critical paths of the circuit lines $C[5]$ and $C[2]$. However, this value can be reduced with manual tweaks. By eliminating Lines 29, 31 and 38, and inserting $C[5] \leftarrow C[22] \oplus C[24]$ and $C[5] \leftarrow C[5] \oplus C[19]$ at the beginning, the delay of $C[5]$ is reduced to $2 T_X$ (and one XOR is saved). By moving Line 39 to before Line 36 the critical path of $C[2]$ is also reduced to only $2 T_X$, which becomes the total delay of the full circuit.
+
+\end{appendices}
+
+\end{document}
