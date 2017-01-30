@@ -53,7 +53,7 @@ In this work we focus on polynomial structures for finite fields, with $p=2$ unl
 
 \[
 A = [a_{m-1}, a_{m-2}, ..., a_2, a_1, a_0] \\
-\text{e.g.}~A = x^6+x^3+x = 1x^6+0x^5+0x^4+1x^3+0x^2+1x+0 \rightarrow [1, 0, 0, 1, 0, 1, 0]
+\text{e.g.}~A(x) = x^6+x^3+x = 1x^6+0x^5+0x^4+1x^3+0x^2+1x+0 \rightarrow [1, 0, 0, 1, 0, 1, 0]
 \].
 
 In this view, a field addition is just a XOR operation item-wise:
@@ -63,10 +63,10 @@ $$(x^5+x^2)+(x^2+1) \rightarrow [0, 1, 0, 0, 1, 0, 0] \oplus [0, 0, 0, 0, 1, 0, 
 and a multiplication can be performed by a regular polynomial multiplication followed by a reduction function. This function takes a "double wide" polynomial (because the resulting degree can be up to $2m-2$), which is not an element of the field, and returns the representation of the correct element (the product):
 
 \[
-A \cdot B = C \equiv D \mod x^7+x^4+1\\
+A(x) \cdot B(x) = C(x) \equiv D(x) \mod x^7+x^4+1\\
 (x^6+1) \cdot (x^3+x^2+x+1) = x^9 + x^8 + x^7 + x^6 + x^3 + x^2 + x + 1 \\
-\texttt{reduce}([0, 0, 0, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1],~x^7+x^4+1) = [0, 1, 0, 1, 1, 1, 1, 0]\\
+\texttt{reduce}([0, 0, 0, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1],~x^7+x^4+1) \rightarrow [0, 1, 0, 1, 1, 1, 1, 0]\\
 \equiv x^6 + x^4 + x^3 + x^2 + x \mod x^7+x^4+1
 \]
 
-This function, $\texttt{reduce}(C, x^m+...+1) = D$ is the main focus of this work.
+This function, $\texttt{reduce}(C, x^m+...+1) = D$ is the main focus of this work, as it is generalized and used for efficient exponentiations.
