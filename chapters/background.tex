@@ -33,9 +33,11 @@ $$5 \cdot 4 \equiv 7 \mod 13 \\$$
 
 Division works by finding a value $A^{-1}$ such that $A \cdot A^{-1} \equiv 1 \mod p$. For example, $5^{-1} = 8 \mod 13$ because $5 \cdot 8 \equiv 1 \mod 13$.
 
-For finite fields $\F_{p^m}$ with $m > 1$, one possible structure is to use polynomials of degree $<m$, and coefficientes in $\F_{p}$: $A = \sum_{i=0}^{m-1} a_i x^i,~a_i \in \F_{p}$. Then we choose an \emph{irreducible polynomial}, of degree $m$ and coefficientes in $\F_{p}$, to perform the modulo operation.
+\subsection{Polynomial representation}
 
-As an example, the field $\F_{2^7}$ ($p=2,~m=7$) can be constructed as:
+For finite fields $\F_{p^m}$ with $m > 1$, one possible structure is to use polynomials of degree $<m$, and coefficientes in $\F_{p}$: $A = \sum_{i=0}^{m-1} a_i x^i,~a_i \in \F_{p}$. Then we choose an \emph{irreducible polynomial} $f$, of degree $m$ and coefficientes in $\F_{p}$, to perform the modulo operation. The standard notation for this structure is $\F_p[x]/f$, where $\F_p[x]$ represents polynomials with coefficients in $\F_p$ and variable $x$, while $/f$ means that operations are performed modulo the irreducible polynomial $f$. Note the polynomial must be irreducible, otherwise some elements won't have a multiplicative inverse.
+
+As an example of this polynomial representation, the field $\F_{2^7}$ ($p=2,~m=7$) can be constructed as:
 
 $$\F_{2}[x]/(x^7+x^4+1) = (\{0, 1, x, x+1, x^2, x^2+1, x^2+x, ... x^6+x^5+x^4+x^3+x^2+x+1\}, +, \cdot)$$
 
@@ -43,11 +45,11 @@ In this case addition is performed as usual for polynomials, but with the coeffi
 
 $$(x^2+x+1) + (x+1) = (x^2+2x+2) \equiv (x^2)$$.
 
-Note that no modulo operation, or \emph{reduction}, is required for additions because they never surpass the degree of the operands. Multiplications, on the other hand, may increase the degree, and is performed modulo the irreducible polynomial $x^7+x^4+1$:
+Note that no modulo operation, or \emph{reduction}, is required for additions because they never surpass the degree of the operands. Multiplications, on the other hand, may require reduction and are performed modulo the irreducible polynomial, or $x^7+x^4+1$ in this example:
 
 $$(x^4+1) \cdot (x^3+x^2+x+1) \equiv (x^6+x^5+x^3+x^2+x) \mod (x^7+x^4+1)$$.
 
-The choice of irreducible polynomial doesn't affect the mathematical structure (it is still a $\F_{2^7}$ finite field), but it does affect the performance of operations in the field when inplemented in hardware or software.
+The choice of irreducible polynomial doesn't affect the mathematical structure (it is still a $\F_{2^7}$ finite field). However, certain polynomials have properties that lead to simplifications in the field operations, making them of high interest for fast implementation in hardware or software. Note these representations are isomorphic (there is only one $\F_{2^7}$), therefore it is possible to convert elements between representations of the same field (e.g. change the irreducible polynomial during an operation), but this is usually a costly operation.
 
 In this work we focus on polynomial structures for finite fields, with $p=2$ unless noted. They are specially interesting for computations because the coefficients can be thought of as bits, and each element as an array of their coefficients:
 
