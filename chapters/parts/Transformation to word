@@ -2,7 +2,7 @@ Transformation to word
 
 \subsection{Word operation of the  Algorithm~\ref{alg:general:bit:operation}}\label{sec:word:operation}
 
-The word-oriented versions of the algorithm can be created by noticing the bit access pattern. The XOR operation pattern can be thought of XORing two ranges
+The word-oriented versions of the algorithm can be created by noticing the bit access pattern. The XOR operation pattern can be thought of XORing two ranges.
 
 Each of them perform a XOR operation between all bits in a certain range and counterparts a fixed distance away. This access pattern allows word-level parallelism. There are four issues that need to be paid attention to:
 

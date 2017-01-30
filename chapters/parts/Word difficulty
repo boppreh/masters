@@ -1,0 +1,8 @@
+Difficulty
+
+
+The difficulty of the conversion process greatly varies depending on the
+access pattern of the algorithm and alignment of words. If all coefficients inside a range are
+XOR'ed once in a linear fashion, the XOR distance a multiple of the word size, and the start and end range lie in word boundaries, the converted algorithm gains a full
+speedup of up to \texttt{WORD\_SIZE} times
+{[}$C_{word} = \ceil*{\frac{C_{bit}}{W}}${]}.
