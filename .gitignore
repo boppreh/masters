@@ -1,3 +1,10 @@
 *.pdf
 *.swp
 *.aux
+*.las
+*.lof
+*.log
+*.lsb
+*.toc
+*.lot
+*.gz
