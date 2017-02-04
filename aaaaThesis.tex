@@ -116,15 +116,12 @@
 
 % Introdução a finite fields
 \chapter{Mathematical background}\label{cap:background}
+% Nào repetir o que tem na literatura. Colocar material que não tem na literatura, condensada e descrita de maneira tal que a pessoa que ler o trabalho vai necessitar saber. Colocar material necessário para as pessoas entenderam o que está sendo proposto.
 \input{chapters/background}
 
 % Artigo rejeitado para IEEE (https://www.sharelatex.com/project/56e84e3540deb4e636bf5aab)
-\chapter{Reduction and Squaring in $GF(2^\MakeLowercase{m})$}
+\chapter{Reduction and Exponentiation in $GF(\MakeLowercase{p}^\MakeLowercase{m})$}
 \input{chapters/reduction_squaring_2}
-
-% Parte de p-ésima potência do artigo submetido por último (https://www.sharelatex.com/project/5797e2f474f358335fdc55f5)
-\chapter{Generalized reduction and squaring in $GF(\MakeLowercase{p}^\MakeLowercase{m})$} \label{pth}
-\input{chapters/reduction_squaring_p}
 
 % Technical report (https://www.sharelatex.com/project/55f7e238e04e2805561c2a10)
 \chapter{Word Processing}
@@ -143,15 +140,12 @@
 \chapter{Final considerations}
 \input{chapters/final_considerations}
 
-
-
-
 \section{References}
 
 \bibliographystyle{ufsc-alf}
 \bibliography{aaabibliografia}
 
-\begin{appendices}
+\appendix
 
 \section{Example of resulting algorithm}
 \label{appendix:example}
@@ -211,6 +205,5 @@
 
 Algorithm~\ref{alg:square:example} is an instance of Algorithm~\ref{alg:square}, wherein the irreducible polynomial is defined as $x^{19}+x^5+x^2+x+1$ by simply fixing $f$. We note the circuit has a delay of $3T_X$, due to the critical paths of the circuit lines $C[5]$ and $C[2]$. However, this value can be reduced with manual tweaks. By eliminating Lines 29, 31 and 38, and inserting $C[5] \leftarrow C[22] \oplus C[24]$ and $C[5] \leftarrow C[5] \oplus C[19]$ at the beginning, the delay of $C[5]$ is reduced to $2 T_X$ (and one XOR is saved). By moving Line 39 to before Line 36 the critical path of $C[2]$ is also reduced to only $2 T_X$, which becomes the total delay of the full circuit.
 
-\end{appendices}
 
 \end{document}

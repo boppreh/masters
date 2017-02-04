@@ -1,9 +1,12 @@
-During our research we also studied $GF(2^m)$ arithmetic for CPUs, where the coefficient bits are grouped into words. Because this introduces a new layer of complexity, we decided to focus on the small but important area of polynomial reduction modulo a trinomial, a common operation in $\F_2[x]/(x^m+x^a+1)$.
+\section{Introduction}
 
-\begin{figure}[htb]
-  \centering
-  \includegraphics[width = .55\columnwidth]{figures/element-word.pdf}
-\end{figure}
+During our research we also studied $GF(2^m)$ arithmetic for CPUs, where the coefficient bits are grouped into words. Because this introduces a new layer of complexity, we decided to focus on the small but important area of polynomial reduction modulo a trinomial, a common operation in $\F_2[x]/(x^m+x^a+1)$. \\
+
+% Figura está solta.
+%\begin{figure}[htb]
+%  \centering
+%  \includegraphics[width = .55\columnwidth]{figures/element-word.pdf}
+%\end{figure}
 
 This operation has some important practical applications. Using a trinomial as irreducible polynomial is  preferred when available because it maximizes the number of zero coefficients in the the irreducible polynomial, enabling numerous simplifications. And the reduction operation is an important step for multiplications and exponentiations, making speedups desirable.
 
@@ -20,11 +23,17 @@ for alignment. This is the approach used in this document.
 
 The word-oriented algorithm can be helped by choosing specific field sizes and irreducible polynomials that introduce operations aligning at word boundaries, to avoid these bitwise shifts and masks, or that map well to architecture-specific operations. In our algorithms we try to make use of alignment opportunities when they appear, but do not depend on them or any specific architecture.
 
-\subsection{Delay independence}
+\section{Delay independence}
 
 Performing binary polynomial reduction in a CPU has a few differences from implementing a hardware circuit. For example, circuits often avoid irreducible polynomials with the second largest exponent $a > \ceil{m/2}$. As seen before with pentanomials, this characteristic leads to higher delays in most circuit-based reduction algorithms. This is caused by the inter-dependency of the calculations, limiting the natural parallelism of circuits and thus increases the total delay.
 
-This property does not affect software implementations. To illustrate this, we take two algorithms that perform modular reduction for the NIST irreducible trinomials $x^{233} + x^{74} + 1$ and $x^{409} + x^{87} + 1$~\cite[p. 55]{hankerson2006guide}. Then we manually adapt each of these algorithms to perform a reduction modulo its reciprocal, $x^m + x^{a-m} + 1$. Notice the only change required is in the indexing and bitwise shifts. The total number of operations remains the same. Algorithms meant for circuit implementations, on the other hand, would have different delay characteristics on each version.
+This property does not affect software implementations. To illustrate this, we take two algorithms that perform modular reduction for the NIST irreducible trinomials $x^{233} + x^{74} + 1$ and $x^{409} + x^{87} + 1$~\cite[p. 55]{hankerson2006guide}. Then we manually adapt each of these algorithms to perform a reduction modulo its reciprocal, $x^m + x^{a-m} + 1$. Notice the only change required is in the indexing and bitwise shifts. The total number of operations remains the same. Algorithms meant for circuit implementations, on the other hand, would have different delay characteristics on each version. % Muito pouco. Expandir. Mostrar diferenças linha-a-linha.
+
+% Explicar melhor os algoritmos.
+
+% Exemplos de execução (olhar no livro do hankerson)
+
+% Tabela comparando custo para deixar explícito que o custo é o mesmo.
 
 \begin{algorithm}
 \begin{algorithmic}[1]
@@ -113,7 +122,7 @@ This property does not affect software implementations. To illustrate this, we t
 \end{algorithmic}
 \end{algorithm}
 
-\subsection{Notations}
+\section{Notations}
 
 In this paper, we assume that one word has $W$ bits where $W$ is a multiple of $8$. The bits of a word $A$ are numbered from $0$ to $W-1$, with the rightmost bit corresponding to the $x^0$ coefficient (LSB) of $A$ designated as bit $0$. The following standard notation is used to denote operations on words $A$ and $B$:\\
 
@@ -127,7 +136,7 @@ In this paper, we assume that one word has $W$ bits where $W$ is a multiple of $
   $A, B, C, D$ & Vector of bits corresponding to the polynomials $a, b, c, d$.\\
 \end{tabular}\\
 
-\subsection{Bit grouping}
+\section{Bit grouping}
 
 Figure~\ref{fig:elemento:field} shows the representation of a element $d \in \ftwom$ as an array $D$ of $t$ words of $W$ bits, where $t = \left \lceil \frac{m}{W} \right \rceil$. The $s = tW-m$ highest order bits of $D[t-1]$ are not unused.
 \begin{figure}[htb]

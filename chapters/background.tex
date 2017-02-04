@@ -1,74 +1,124 @@
-\subsection{Finite fields}
+\section{Introduction}
+
+% Nessa dissertação precisamos entender artimética em corpos finitos...
+% Corpos finitos são usadas em várias plicações e preicsamos entender detalhadamente como são implemetadas ... em corpos fniitos. E para isso é preiso entender a representação dos polinomimos....
+This chapter is an introduction to the concepts that we will build upon. In Section~\ref{background:finite_fields} we explain the very basics of finite fields, trying to build an intuition of the structures involved. In Section~\ref{background:polynomial_representation} we focus on fields constructed from polynomials, and how to represent them. Section~\ref{background:arithmetic} explains the basics of arithmetic on binary polynomial basis, with some useful properties. Finally, in Section~\ref{background:binary} details where and how this type of arithmetic is used in practice.
+
+% used for?
+
+% Mínimo 10 páginas
+
+\section{Finite fields} \label{background:finite_fields}
 
 A Finite Field $\F_{p^m}$ (also known as Galois Field $GF(p^m)$) is an abstract mathematical structure composed of a set of elements and two operators:
 
-\[
-\F_{p^m} = (\{A_0, A_1, A_2, ... A_{p^m-1}\}, +, \cdot)
-\]
+\begin{gather*}
+\F_{p^m} = (\{A_0, A_1, A_2, ... A_{p^m-1}\}, +, \cdot),
+\end{gather*}
+
+where:
 
 \begin{itemize}
-\item $\F_{p^m}$: A finite field of size $p^m$, where:
+\item $\F_{p^m}$: is a finite field of size $p^m$, where:
     \begin{itemize}
     \item $p$: the \emph{field characteristic}, $p \in \mathbb{P}$ (i.e. must be a prime number);
-    \item $m$: the \emph{extension size} $m \geq 1, m \in \mathbb{N}$;
+    \item $m$: the \emph{extension size} $m \in \mathbb{N^*}$ (i.e. $m \geq 1,~m$ integer);
     \end{itemize}
-\item $\{A_0, A_1, A_2, ... A_{p^m-1}\}$: A set of $p^m$ \emph{field elements}. In this work we use the names $A$, $B$ and $C$ to refer to arbitrary members of this set, and $\F_{p^m}$ as an informal shorthand for this set (e.g. $A \in \F_{p^m}$).
-\item $+, \cdot$~: Addition and multiplication operators, where:
+\item $\{A_0, A_1, A_2, ... A_{p^m-1}\}$: is a set of $p^m$ \emph{field elements}. In this work we use the letters $A$, $B$ and $C$ to refer to arbitrary members of this set, and $\F_{p^m}$ as an informal shorthand for this set (e.g. $A \in \F_{p^m}$).
+\item $+, \cdot$~: are addition and multiplication operators, where:
     \begin{itemize}
-    \item they are binary operators that operate field elements, $+, \cdot : (\F_{p^m} \times \F_{p^m}) \mapsto \F_{p^m}$;
+    \item they are binary operators that operate on field elements, $+, \cdot : (\F_{p^m} \times \F_{p^m}) \mapsto \F_{p^m}$;
     \item there are two elements labeled $0$ and $1$ that behave as the additive and multiplicative identities, $0 \neq 1$, such that $\forall A (A + 0 = A~\wedge~A \cdot 1 = A)$;
     \item both operations commute (i.e. $A + B = B + A$ and $A \cdot B = B \cdot A$) and associate (i.e. $(A + B) + C = A + (B + C)$ and $(A \cdot B) \cdot C = A \cdot (B \cdot C)$);
-    \item every element has an additive and a multiplicative inverse, also in the field (i.e. there are elements $-A$ and $A^{-1}$ such that $A + -A = 0$ and $A \cdot A^{-1} = 1$);
+    \item every element has an additive and a multiplicative inverse, also in the field (i.e. there are elements $-A$ and $A^{-1}$ such that $A + (-A) = 0$ and $A \cdot A^{-1} = 1$);
     \item except the multiplicative identity $0$, which has no multiplicative inverse (i.e. $0^{-1}$ is undefined);
     \end{itemize}
 \end{itemize}
 
-All fields of the same size are isomorphic, and therefore a field can be uniquely identified by its size. There are many ways to construct a field, with modular arithmetic being a common one. Finite fields are commonly constructed using integer arithmetic when $m=1$ (e.g. $\F_{13}$) or polynomial modular arithmetic otherwise (e.g. $\F_{2}[x]/(x^7+x^4+1)$.
+All fields of the same size are isomorphic, and therefore a field can be uniquely identified by its size. There are many ways to construct a field, with modular arithmetic being a common one. Finite fields are commonly constructed using integer arithmetic when $m=1$ (e.g. $\F_{13}$) or polynomial modular arithmetic otherwise (e.g. $\F_{2}[x]/(x^7+x^4+1)$.\\
 
-Take for example the prime field $\F_{13}$ ($p=13,~m=1$), constructed as $(\{0, 1, 2, ... 11, 12\}, +, \cdot)$. In this field addition and multiplication are the usual operations, but always modulo the field size, $13$. Therefore:
+Take for example the field $\F_{13}$ ($p=13,~m=1$). Fields with $m=1$ must have a prime number of elements, and are commonly called \emph{prime fields}. In the case $\F_{13}$, it can be constructed as $(\{0, 1, 2, ... 11, 12\}, +, \cdot)$. In this field, addition and multiplication are the usual operations, but always modulo the field size, $13$. Therefore:
 
-$$5 + 10 \equiv 2 \mod 13 \\$$
-$$5 - 10 \equiv 8 \mod 13 \\$$
-$$5 \cdot 4 \equiv 7 \mod 13 \\$$
+\begin{align*}
+5 + 10 &\equiv 2 \mod 13 \\
+5 \cdot 4 &\equiv 7 \mod 13 \\
+\end{align*}
+
+Subtraction and division are performed using the additive and multiplicative inverses..... % TODO
 
 Division works by finding a value $A^{-1}$ such that $A \cdot A^{-1} \equiv 1 \mod p$. For example, $5^{-1} = 8 \mod 13$ because $5 \cdot 8 \equiv 1 \mod 13$.
 
-\subsection{Polynomial representation}
+\section{Polynomial representation} \label{background:polynomial_representation}
 
-For finite fields $\F_{p^m}$ with $m > 1$, one possible structure is to use polynomials of degree $<m$, and coefficientes in $\F_{p}$: $A = \sum_{i=0}^{m-1} a_i x^i,~a_i \in \F_{p}$. Then we choose an \emph{irreducible polynomial} $f$, of degree $m$ and coefficientes in $\F_{p}$, to perform the modulo operation. The standard notation for this structure is $\F_p[x]/f$, where $\F_p[x]$ represents polynomials with coefficients in $\F_p$ and variable $x$, while $/f$ means that operations are performed modulo the irreducible polynomial $f$. Note the polynomial must be irreducible, otherwise some elements won't have a multiplicative inverse.
+For finite fields $\F_{p^m}$ with $m > 1$, one possible structure is to use polynomials of degree $<m$, where coefficients in $\F_{p}$. For instance, the element $A$ can be represented as $\sum_{i=0}^{m-1} a_i x^i,~a_i \in \F_{p}$. Then we choose an \emph{irreducible polynomial} $f$, of degree $m$ and coefficients in $\F_{p}$, and results are taken modulo $f$.\\
 
-As an example of this polynomial representation, the field $\F_{2^7}$ ($p=2,~m=7$) can be constructed as:
+The concept of irreducible polynomials is analogous to the primality of integers. A polynomial is \emph{irreducible} if it has degree larger than $2$, and cannot be factored into the product of two other polynomials of degree larger than $2$. It can be thought as a polynomial with no non-trivial divisors.\\
 
-$$\F_{2}[x]/(x^7+x^4+1) = (\{0, 1, x, x+1, x^2, x^2+1, x^2+x, ... x^6+x^5+x^4+x^3+x^2+x+1\}, +, \cdot)$$
+The standard notation for fields using modular arithmetic with irreducible polynomials is $\F_p[x]/f$, where $\F_p[x]$ represents polynomials with coefficients in $\F_p$ and variable $x$, while $/f$ means that operations are performed modulo the irreducible polynomial $f$. As an example of a polynomial representation, the field $\F_{2^7}$ ($p=2,~m=7$) can be constructed as:
 
-In this case addition is performed as usual for polynomials, but with the coefficients in $\F_2$:
+\begin{gather*}
+\F_{2}[x]/(x^7+x^4+1) = (\{0, 1, x, x+1, x^2, x^2+1, x^2+x, \\
+\hspace{8mm} \ldots~, x^6+x^5+x^4+x^3+x^2+x+1\}, +, \cdot)
+\end{gather*}
+
+In this case, addition is performed as usual for polynomials, but with the coefficients in $\F_2$:
 
 $$(x^2+x+1) + (x+1) = (x^2+2x+2) \equiv (x^2)$$.
 
-Note that no modulo operation, or \emph{reduction}, is required for additions because they never surpass the degree of the operands. Multiplications, on the other hand, may require reduction and are performed modulo the irreducible polynomial, or $x^7+x^4+1$ in this example:
+Note that no modulo operation, or \emph{reduction}, is required for additions. This is because the degree of $A+B$ is at most the of $A$ or the degree of $B$. Multiplications, on the other hand, may require reduction modulo $f$ (e.g. $f=x^7+x^4+1$ in this example):
 
 $$(x^4+1) \cdot (x^3+x^2+x+1) \equiv (x^6+x^5+x^3+x^2+x) \mod (x^7+x^4+1)$$.
 
-The choice of irreducible polynomial doesn't affect the mathematical structure (it is still a $\F_{2^7}$ finite field). However, certain polynomials have properties that lead to simplifications in the field operations, making them of high interest for fast implementation in hardware or software. Note these representations are isomorphic (there is only one $\F_{2^7}$), therefore it is possible to convert elements between representations of the same field (e.g. change the irreducible polynomial during an operation), but this is usually a costly operation.
+\section{Arithmetic in finite fields} \label{background:arithmetic}
 
-In this work we focus on polynomial structures for finite fields, with $p=2$ unless noted. They are specially interesting for computations because the coefficients can be thought of as bits, and each element as an array of their coefficients:
+The choice irreducible polynomial doesn't affect the algebraic structure, since it is isomorphic to any other representations of $\F_{p^m}$. However, certain polynomials have properties that may lead to simplifications in the field operations, making them of high interest for fast implementation in hardware or software.\\
 
-\[
-A = [a_{m-1}, a_{m-2}, ..., a_2, a_1, a_0] \\
-\text{e.g.}~A(x) = x^6+x^3+x = 1x^6+0x^5+0x^4+1x^3+0x^2+1x+0 \rightarrow [1, 0, 0, 1, 0, 1, 0]
-\].
+In this work, we focus on polynomial representations of finite fields, with $p=2$ unless noted (e.g. $\F_{2^m}$). They are specially interesting for computations because the coefficients can be thought of as bits, and each element as an array of their coefficients. For example, for an arbitrary element $A$ we can represent it as a sequence of bits with the following notation:
 
-In this view, a field addition is just a XOR operation item-wise:
+\begin{align*}
+A(x) &= x^6+x^3+x \\
+& = 1x^6+0x^5+0x^4+1x^3+0x^2+1x+0\\
+& \rightarrow [1, 0, 0, 1, 0, 1, 0] \\
+\\
+A &= [a_{m-1}, a_{m-2}, ..., a_2, a_1, a_0] \\
+\end{align*}.
 
-$$(x^5+x^2)+(x^2+1) \rightarrow [0, 1, 0, 0, 1, 0, 0] \oplus [0, 0, 0, 0, 1, 0, 1] = [0, 1, 0, 0, 0, 0, 0]$$,
+This representation is named \emph{polynomial basis}. In this view, a field addition is just a bitwise XOR operation. For example, the addition of two polynomials $(x^5+x^2)+(x^2+1)$:
 
-and a multiplication can be performed by a regular polynomial multiplication followed by a reduction function. This function takes a "double wide" polynomial (because the resulting degree can be up to $2m-2$), which is not an element of the field, and returns the representation of the correct element (the product):
+\begin{gather*}
+(x^5+x^2)+(x^2+1) \rightarrow [0, 1, 0, 0, 1, 0, 0] \oplus [0, 0, 0, 0, 1, 0, 1] \\
+= [0, 1, 0, 0, 0, 0, 0],
+\end{gather*}
 
-\[
-A(x) \cdot B(x) = C(x) \equiv D(x) \mod x^7+x^4+1\\
+and a multiplication can be performed by a regular polynomial multiplication followed, if needed, by a reduction operation. This $\texttt{reduce}_f$ function takes a "double wide" polynomial (because the resulting degree can be up to $2m-2$), which is not reduced representation of a field element, and returns the reduced representation (the product):
+
+\begin{gather*}
+C = A \cdot B\\
+D \equiv C \mod f\\
+\\
 (x^6+1) \cdot (x^3+x^2+x+1) = x^9 + x^8 + x^7 + x^6 + x^3 + x^2 + x + 1 \\
-\texttt{reduce}([0, 0, 0, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1],~x^7+x^4+1) \rightarrow [0, 1, 0, 1, 1, 1, 1, 0]\\
+\texttt{reduce}_f([0, 0, 0, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1]) \rightarrow [0, 1, 0, 1, 1, 1, 1, 0]\\
 \equiv x^6 + x^4 + x^3 + x^2 + x \mod x^7+x^4+1
-\]
+\end{gather*}
 
 This function, $\texttt{reduce}(C, x^m+...+1) = D$ is the main focus of this work, as it is generalized and used for efficient exponentiations.
+
+\section{Binary finite field arithmetic in ECC} \label{background:binary}
+
+% Mais para um capítulo de introdução do que de background.
+% Faltando estado da arte, faltando tabela.
+% Avanços históricos, em relação da complexidade.
+
+Arithmetic in the finite field $GF(2^m)$ of $2^m$ elements (also denoted $\F_{2^m}$) is fundamental for many important cryptosystems such as ECC (Elliptic Curve Cryptography). Such arithmetic is usually implemented by choosing an irreducible polynomial $f \in \F_2[x]$, $\deg(f) = m$, performing operations and reducing modulo this polynomial. It is common to have algorithms that implement arithmetic operations using a particular class of irreducible polynomials. This is because these algorithms are efficiently implemented considering such class of irreducibles.\\
+
+Arithmetic operations in $GF(2^m)$ usually consist of addition (being equivalent to subtraction in characteristic 2), multiplication (of which squaring is a special case) and inverses. All these operations are used in ECC, making any optimizations reflect directly on the speed of elliptic curve arithmetic, raising the importance of choosing an irreducible polynomial and associated algorithms. As examples, the classes of pentanomials $x^m+x^{n+2}+x^{n+1}+x^{n}+1$, $x^{4s}+x^{3s}+x^{2s}+x^s+1$, $x^m+x^{m-r}+x^s+x^r+1$ and $x^m+x^{n+1}+x^n+x+1$ are used in fast multipliers~\cite{fan2015survey}, each with their own fast multiplication and reduction algorithms.\\
+
+However, the algorithms designed for irreducible polynomials with specific exponents may contain internal structures with an unclear impact on security of applications that use these algorithms. No attacks have been demonstrated so far, but the security community has seen evidence of standards containing back doors~\cite{bernstein2016dual} and cryptography failing due to fixed parameters~\cite{adrian2015imperfect}. In light of these events there has been discussions for less magic parameters and more randomness in the structures used.\\
+
+A related problem is that many classes of irreducible polynomials contain few elements with degrees interesting for instance for ECC, often having no irreducible polynomials at all for a desired degree. Furthermore, choosing a class to speed up a specific operation may lead to less efficient algorithms for other operations used in the same application. Choosing the parameters for a field is therefore an exercise in tradeoffs.
+
+%\section{Conclusion}
+% Opcional
+
+
+% TODO: referências.
