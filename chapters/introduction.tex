@@ -15,3 +15,17 @@
 
 
 
+
+\section{Binary finite field arithmetic in ECC} \label{background:binary}
+
+% Mais para um capítulo de introdução do que de background.
+% Faltando estado da arte, faltando tabela.
+% Avanços históricos, em relação da complexidade.
+
+Arithmetic in the finite field $GF(2^m)$ of $2^m$ elements (also denoted $\F_{2^m}$) is fundamental for many important cryptosystems such as ECC (Elliptic Curve Cryptography). Such arithmetic is usually implemented by choosing an irreducible polynomial $f \in \F_2[x]$, $\deg(f) = m$, performing operations and reducing modulo this polynomial. It is common to have algorithms that implement arithmetic operations using a particular class of irreducible polynomials. This is because these algorithms are efficiently implemented considering such class of irreducibles.\\
+
+Arithmetic operations in $GF(2^m)$ usually consist of addition (being equivalent to subtraction in characteristic 2), multiplication (of which squaring is a special case) and inverses. All these operations are used in ECC, making any optimizations reflect directly on the speed of elliptic curve arithmetic, raising the importance of choosing an irreducible polynomial and associated algorithms. As examples, the classes of pentanomials $x^m+x^{n+2}+x^{n+1}+x^{n}+1$, $x^{4s}+x^{3s}+x^{2s}+x^s+1$, $x^m+x^{m-r}+x^s+x^r+1$ and $x^m+x^{n+1}+x^n+x+1$ are used in fast multipliers~\cite{fan2015survey}, each with their own fast multiplication and reduction algorithms.\\
+
+However, the algorithms designed for irreducible polynomials with specific exponents may contain internal structures with an unclear impact on security of applications that use these algorithms. No attacks have been demonstrated so far, but the security community has seen evidence of standards containing back doors~\cite{bernstein2016dual} and cryptography failing due to fixed parameters~\cite{adrian2015imperfect}. In light of these events there has been discussions for less magic parameters and more randomness in the structures used.\\
+
+A related problem is that many classes of irreducible polynomials contain few elements with degrees interesting for instance for ECC, often having no irreducible polynomials at all for a desired degree. Furthermore, choosing a class to speed up a specific operation may lead to less efficient algorithms for other operations used in the same application. Choosing the parameters for a field is therefore an exercise in tradeoffs.

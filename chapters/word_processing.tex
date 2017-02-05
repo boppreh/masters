@@ -1,12 +1,16 @@
 \section{Introduction}
 
-During our research we also studied $GF(2^m)$ arithmetic for CPUs, where the coefficient bits are grouped into words. Because this introduces a new layer of complexity, we decided to focus on the small but important area of polynomial reduction modulo a trinomial, a common operation in $\F_2[x]/(x^m+x^a+1)$. \\
+In the previous chapters we discussed algorithms that operated on finite field elements as if they were made of individual bits (the binary coefficients). This is a sensible approach for building circuits, as the bits map naturally to simple signals, allowing the circuits to be constructed with basic logic gates. \\
 
-% Figura está solta.
-%\begin{figure}[htb]
-%  \centering
-%  \includegraphics[width = .55\columnwidth]{figures/element-word.pdf}
-%\end{figure}
+However, during our research we also studied $GF(2^m)$ arithmetic for CPUs, where the individual bit approach is not efficient. In theory software could also operate on individual bits of each element, but this would require multiple instructions to process each bit, not to mention additional overhead on architecture incapable of addressing single bits. \\
+
+On software implementations, the more sensible approach is to group the coefficients into CPU words (see Fig.~\ref{fig_simple_words}). Because this introduces a new layer of complexity, we decided to focus on the small but important area of polynomial reduction modulo a trinomial, a common operation in $\F_2[x]/(x^m+x^a+1)$. \\
+
+\begin{figure}
+  \caption{Representation of a binary field element with bits divided into words.}
+  \label{fig:simple_words}
+  \includegraphics[width = .55\columnwidth]{figures/element-word.pdf}
+\end{figure}
 
 This operation has some important practical applications. Using a trinomial as irreducible polynomial is  preferred when available because it maximizes the number of zero coefficients in the the irreducible polynomial, enabling numerous simplifications. And the reduction operation is an important step for multiplications and exponentiations, making speedups desirable.
 
