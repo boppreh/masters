@@ -8,7 +8,7 @@ Therefore we needed a way to quickly test different parameters, and have the res
 
 \section{Manual reduction algorithm} \label{section:visual:manual}
 
-The reduction process for polynomials in $GF(2^m)$ depends on two values: the irreducible polynomial $f(x) = x^m + x^a + ... + 1$, and the value to be reduced, $C(x) = \sum_{i=0}^{d} c_i x^i$, $d \geq m$. Here we focus on the common case $d=2m-2$, where $C$ is the product of two polynomials of degree $m$, or the square of a single polynomial of this size. \\
+The reduction process for polynomials in $GF(2^m)$ depends on two values: the irreducible polynomial $f(x) = x^m + x^a + ... + 1$, and the value to be reduced, $C(x) = \sum_{i=0}^{d} c_i x^i$, $d \geq m$. Here we focus on the case $d=2m-2$. This is a common situation that arises when $C$ is the product of two polynomials of degree less than $m$, or the square of a single polynomial of this size. \\
 
 For example, take the irreducible trinomial $f(x) = x^7 + x^3 + 1$, and $C(x) = x^{12} + x^{10} + x^9 + x^7 + x^6 + x^3 + x^2 + 1$. We can look at $f$ and $C$ as arrays of bits (see Figure~\ref{fig:visual:table_simplest}). \\
 
@@ -23,7 +23,7 @@ For example, take the irreducible trinomial $f(x) = x^7 + x^3 + 1$, and $C(x) = 
 \label{fig:visual:table_simplest}
 \end{figure}
 
-At this point in the research, the algorithm we were using for polynomial reduction was slightly different from the one previously shown. First, notice that $0 \equiv f \mod f$, so we can add $f$ or any multiple to an expression. The reduction algorithm then consists of, for each term $c_i x^i,~i \geq deg(f)$, adding $c_{i} x^{i-m} f(x)$. By adding $c_i x^{i}$ we are canceling that term, and the other terms added have degree strictly smaller than the one canceled. \\
+At this point in the research, the algorithm we were using for polynomial reduction was slightly different from the one previously shown. First, notice that $0 \equiv f \mod f$, so we can add $f$ or any multiple to an expression. The reduction algorithm then consists of, for each term $c_i x^i,~i \geq deg(f)$, adding $c_{i} x^{i-m} f(x)$. The highest term will be $c_i x^{i-m+m} = c_i x^i$, which cancels the original term, and the other terms added have degree strictly smaller than the one canceled. \\
 
 Notice, however, that while the other terms added have a smaller degree, they may still require further reduction. Therefore the algorithm is repeated until all remaining terms have degree smaller than the irreducible polynomial. \\
 
@@ -62,7 +62,7 @@ Note the term $x^8$ is present, so further reduction is necessary. The algorithm
 \label{fig:visual:old_all}
 \end{figure}
 
-The resulting visualization gives some insight into the algorithm, but is obscured by specific values used in this example. A more general visualization is possible, where the coefficients are simply numbered. Figure~\ref{fig:visual:old_all_generic} shows the case for a generic reduction modulo $x^7 + x^3 + 1$. For example, the term $x^2$ of the output is the XOR of the terms $x^2$ and $x^9$ of the input. \\
+The resulting visualization gives some insight into the algorithm, but is obscured by specific values used in this example. A more general visualization is possible, where the coefficients are simply numbered. Figure~\ref{fig:visual:old_all_generic} shows the case for a generic reduction modulo $x^7 + x^3 + 1$. For example, the term $x^2$ of the output is the XOR of the terms $c_2$ and $c_9$ of the input. \\
 
 \begin{figure}
   \centering
@@ -80,12 +80,12 @@ The resulting visualization gives some insight into the algorithm, but is obscur
 \label{fig:visual:old_all_generic}
 \end{figure}
 
-This visual representation was our main exploration tool during the beginning of the research. Unfortunately it quickly gets unwieldy. The number of columns is $2m-2$, so visualizing large irreducible polynomials creates numerous small cells with unreadable contents. Furthermore, tables like these take some time to build by hand, and it's hard to spot patterns in the cell numbers. \\
+This visual representation was our main exploration tool during the beginning of the research. Unfortunately it quickly gets unwieldy. The number of columns is $2m-1$, so visualizing large irreducible polynomials creates numerous small cells with unreadable contents. Furthermore, tables like these take some time to build by hand, and it's hard to spot patterns in the cell numbers. \\
 
 
 \section{Alternative visualization tool} \label{section:visual:alt}
 
-Tables like Figure~\ref{fig:visual:old_all_generic} some time to build by hand, but the process is easy to automate. A Javascript prototype was created, where HTML tables were built automatically for a given irreducible polynomial. This saved time, but did not make the result more readable. Large stables still had had the problem of small cells being unreadable, and spotting numeric patterns continued to be challenging. \\
+Tables like Figure~\ref{fig:visual:old_all_generic} take time to build by hand, but the process is easy to automate. A Javascript prototype was created, where HTML tables were built automatically for a given irreducible polynomial. This saved time, but did not make the result more readable. Large stables still had had the problem of small cells being unreadable, and spotting numeric patterns continued to be challenging. \\
 
 The next step was to notice that the order of the steps does not matter, and neither does the grouping of operations in rows. For example, for the column $x^2$, as long as the inputs for $c_2$ and $c_9$ were XOR-ed together, the result would be correct. That is to say, the table visualization is stateless. \\
 
@@ -93,7 +93,7 @@ Based on this property, an alternative visualization was quickly discovered: mak
 
 Figure~\ref{fig:visual:new} shows an example of this visualization, using $\oplus$ to mark the cells that should be XOR-ed (column-wise) to create the output. First, note that the columns $x^7 \ldots x^{12}$ are empty, as expected for a reduction algorithm. In the old visualization, the column $x^7$, for example, contained the number $7$ twice and the number $11$ twice. The result of these XOR operations is zero, but to arrive at this conclusion one has to go through the values and match the pairs. In the new visualization, cancellations like this are readily apparent because the cells are empty. \\
 
-Furthermore, the two steps of the algorithm are still visible as two pairs of diagonal lines. The first step is a pair of diagonal lines going from $(c_7,~x^0)$ to $(c_{12}~,x^5)$ (from the constant term of the irreducible polynomial), and from $(c_7~,x^3)$ until being cut-off at $(c_{10},~x^6)$ (from the $x^3$ term of the irreducible polynomial). The second step is represented by the pair of diagonal lines from $(c_{11},~x^0)$ to $(c_{12},~x^1)$, and from $(c_{11},~x^3)$ to $(c_{12},~x^4)$. \\
+Furthermore, the two steps of the algorithm are still visible as two pairs of diagonal lines. The first step is a pair of diagonal lines going from $(c_7,~x^0)$ to $(c_{12}~,x^5)$, and from $(c_7~,x^3)$ until being cut-off at $(c_{10},~x^6)$. The second step is represented by the pair of diagonal lines from $(c_{11},~x^0)$ to $(c_{12},~x^1)$, and from $(c_{11},~x^3)$ to $(c_{12},~x^4)$. \\
 
 \begin{figure}
   \centering
@@ -117,9 +117,9 @@ $c_0$    &   &   &   &   &   &   &   &   &   &   &   &   & $\oplus$
 \label{fig:visual:new}
 \end{figure}
 
-\section{section:visual:final}
+\section{Final improvements} \label{section:visual:final}
 
-The cut-off seen at column $x^7$ in Figure~\ref{fig:visual:new} is technically correct, but truncates patterns that could be useful if seen in full. For example, it's not clear if the diagonal $(c_7~,x^3)$ to $(c_{10},~x^6)$ would really continue if "given the chance", or if it naturally stopped at the column $x^6$. To have a more intuitive understanding of these patterns, we decided to use the tool without any truncation. Mathematically, this means adapting the algorithm to add $c_{i} x^{i-m} f(x) + x^{i}$. An example of this non-truncated visualization is Figure~\ref{fig:visual:new_full}. There we find our answer for the previous conundrum: the diagonal that was truncated really was supposed to continue.
+The cut-off seen at column $x^7$ in Figure~\ref{fig:visual:new} is technically correct, but truncates patterns that could be useful if seen in full. For example, it's not clear if the diagonal $(c_7~,x^3)$ to $(c_{10},~x^6)$ would really continue if "given the chance", or if it naturally stopped at the column $x^6$. To have a more intuitive understanding of these patterns, we decided to use the tool without any truncation. Mathematically, this means adapting the algorithm to add $c_{i} x^{i-m} f(x) + x^{i}$. An example of this non-truncated visualization is Figure~\ref{fig:visual:new_full}. There we find our answer for the previous conundrum: the diagonal that was truncated really was supposed to continue, and each pair of diagonals has the same length.
 
 \begin{figure}
   \centering
@@ -143,9 +143,9 @@ $c_0$    &   &   &   &   &   &   &   &   &   &   &   &   & $\oplus$
 \label{fig:visual:new_full}
 \end{figure}
 
-Additionally, note that this visualization is not only a rearrangement of the cells from the old, manual visualization. We mentioned having to pair values to find cancellations, and this is clearly visible in cases other than the truncation. For example, take the irreducible trinomial $x^6+x^3+1$. Its reduction pattern, when visualized in the old manual way, results in Figure~\ref{fig:visual:old_spaced}. Meanwhile, the new, columns-and-rows visualization, results in Figure~\ref{fig:visual:new_spaced}. \\
+Additionally, note that this visualization is not only a rearrangement of the cells from the old, manual visualization. We mentioned seeing empty cells instead of having to pair values to find cancellations, and this is clearly visible in cases other than the truncation. For example, take the irreducible trinomial $x^6+x^3+1$. Its reduction pattern, when visualized in the old manual way, results in Figure~\ref{fig:visual:old_spaced}. Meanwhile, the new, columns-and-rows visualization, results in Figure~\ref{fig:visual:new_spaced}. \\
 
-In Figure~\ref{fig:visual:old_spaced} notice how columns $x^3$ and $x^4$ had the coefficients from $c_{9}$ and $c_{10}$ added twice, resulting in two cancellations. These cancellations can be inferred in Figure~\ref{fig:visual:old_spaced}, but are glaringly obvious in Figure~\ref{fig:visual:new_spaced}. In fact, one can intuitive understand them by thinking of the two pairs diagonals, and realizing when one the smaller ones (from the second reduction step) "collided" with one of the larger ones (from the first reduction step). The result is that the cells $(c_9,~x^3)$ and $(c_10,~x^4)$ are empty because they were filled twice. \\
+In Figure~\ref{fig:visual:old_spaced} notice how columns $x^3$ and $x^4$ had the coefficients from $c_{9}$ and $c_{10}$ added twice, resulting in two cancellations. These cancellations can be inferred in Figure~\ref{fig:visual:old_spaced}, but are glaringly obvious in Figure~\ref{fig:visual:new_spaced}. In fact, one can intuitive understand them by thinking of the two pairs of diagonals, and realizing that one of the smaller ones "collided" with one of the larger ones. The result is that the cells $(c_9,~x^3)$ and $(c_10,~x^4)$ are empty because they were filled twice. \\
 
 \begin{figure}
   \centering
@@ -183,28 +183,30 @@ $c_0$    &          &          &          &          &          &          &    
 \label{fig:visual:new_spaced}
 \end{figure}
 
-As to why the diagonals moved in a way that resulted in cancellations, we need a way to animate these tables. In the tool this is performed by the mouse scroll-wheel. Scrolling up increments the term $x^a$ in the irreducible polynomial, while scrolling down decrements it. Holding the shift key changes the $x^m$ term instead, the degree of the irreducible polynomial. With this instantaneous feedback one can quickly acquire intuitions on these patterns. For example, incrementing $a$ moves all but the first diagonal (at column $x^0$) one cell to the left. Decrementing $m$ has the same result. This is why the cancellation happened in the $x^6+x^3+1$ case: the diagonals from $x^7+x^3+1$ moved one cell to the left, and one small diagonals "collided" with the first (static) diagonal. \\
+As to why the diagonals moved in a way that resulted in cancellations, we need a way to animate these tables. In the tool this is performed by the mouse scroll-wheel. Scrolling up increments the term $x^a$ in the irreducible polynomial, while scrolling down decrements it. Holding the shift key changes the $x^m$ term instead, the degree of the irreducible polynomial. With this instantaneous feedback one can quickly acquire intuitions on these patterns. For example, incrementing $a$ moves all but the first diagonal (at column $x^0$) one cell to the left. Decrementing $m$ has the same result. This is why the cancellation happened in the $x^6+x^3+1$ case: the diagonals from $x^7+x^3+1$ moved one cell to the left, and one small diagonal "collided" with the first (static) diagonal. \\
 
-All this intuition is naturally very informal. Its main uses is as an exploration tool and as a counter proof searcher. The use as exploratory tool is very clear: just by scrolling the scroll wheel one patterns where diagonals cancel each out perfectly, or where an unexpectedly high number of diagonals appear. Both of these can then be proved by more standard mathematical tools. Meanwhile, it's use as counter proof searcher helped save time in trying to prove false properties. It's easy to search hundreds of polynomials, in a very short space of time, looking for a case where the hypothesis under study is false. \\
+All this intuition is naturally very informal. Its main uses is as an exploration tool and as a counter proof searcher. The use as exploratory tool is very clear: just by scrolling the scroll wheel one can find patterns where diagonals cancel each out perfectly, or where an unexpectedly high number of diagonals appear. Both of these can then be proved by more standard mathematical tools. Meanwhile, its use as counter proof searcher helped save time in trying to prove false properties. It's easy to search hundreds of polynomials, in a very short space of time, looking for a case where the hypothesis under study is false. \\
 
 Finally, this visualization tool was made to include testing of algorithms. At first this was done by allowing the user to click on columns to XOR them, with the goal of taking the identity matrix and transforming into the matrices seen above. This resulted in a surprisingly fun game (see Figure~\ref{fig:game}), but was only feasible for small irreducible polynomials. The second feature added was a text box where the user could input a Javascript algorithm, then display the algorithm execution step by step (Figure~\ref{fig:source}). This feature was later expanded to include word-processing algorithms, non-square tables (for larger reductions), and reduction of squared polynomials. \\
 
 \begin{figure}
   \caption{Game based on reduction algorithms for binary finite fields modulo an irreducible trinomial.}
   \label{fig:game}
+  \centering
   \includegraphics[width = .55\columnwidth]{figures/boppreh.png}
 \end{figure}
 
 \begin{figure}
   \caption{Visualization tool with input box for user algorithms.}
   \label{fig:source}
+  \centering
   \includegraphics[width = .55\columnwidth]{figures/source.png}
 \end{figure}
 
 
 \section{Conclusion} \label{section:visual:conclusion}
 
-In this chapter we presented the visualization tools used during our research. This tool was invaluable in efficiently exploring and testing new ideas related to reduction of binary polynomials. The intuitive visuals and quick feedback allowed even people unfamiliar with the subjects to help find interesting properties.
+In this chapter we presented the visualization tool used during our research. This tool was invaluable in efficiently exploring and testing new ideas related to reduction of binary polynomials. The intuitive visuals and quick feedback allowed even people unfamiliar with the subjects to help find interesting properties.
 
 The development itself of the tool also acted to clarify concepts. For example the fact that each irreducible polynomial has a mathematical "pattern" associated, corresponding to the XORs required for reduction, and that these operations are independent of the algorithm used. The word processing and squaring versions saw less use, but creating them helped guide some of the research.
 
