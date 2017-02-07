@@ -294,3 +294,35 @@ And the word-transformed algorithms are:
   \label{alg:new:word:operation}
 \end{algorithmic}
 \end{algorithm}
+
+
+The algorithm \ref{alg:new:word:operation} proposed can be applied to specific trinomials with fixed parameters. For example, for the commonly used field $x^{233} + x^{74} + 1$, with 32-bit words, this results in algorithm \ref{alg:233-32:word:operation}. The total number of operations of this algorithm is 19 XORs, 16 ORs, 5 ANDs and 35 shifts, for a total of 75 word operations.
+
+\begin{algorithm}
+\begin{algorithmic}[1]
+  \REQUIRE $C\left[0,\ceil*{\frac{2m-2}{W}}\right]$
+  \ENSURE $C[0,m-1]$
+  \STATE $C[2] \gets C[2] \oplus ((C[7] \land \texttt{0x7ffffe00}) << 1)$
+  \STATE $C[3] \gets C[3] \oplus ((C[7] >> 31) \lor (C[8] << 1))$
+  \STATE $C[4] \gets C[4] \oplus ((C[8] >> 31) \lor (C[9] << 1))$
+  \STATE $C[5] \gets C[5] \oplus ((C[9] >> 31) \lor (C[10] << 1))$
+  \STATE $C[6] \gets C[6] \oplus ((C[10] >> 31) \lor (C[11] << 1))$
+  \STATE $C[7] \gets C[7] \oplus ((C[11] >> 31) \lor (C[12] << 1))$
+  \STATE $C[8] \gets C[8] \oplus ((C[12] >> 31) \lor (C[13] << 1))$
+  \STATE $C[9] \gets C[9] \oplus ((C[13] >> 31) \lor ((C[14] \land \texttt{0x1ffff}) >> 1))$
+  \STATE $C[2] \gets C[2] \oplus ((C[12] \land \texttt{0x3fffff00}) << 2)$
+  \STATE $C[3] \gets C[3] \oplus ((C[12] >> 30) \lor (C[13] << 2))$
+  \STATE $C[4] \gets C[4] \oplus ((C[13] >> 30) \lor ((C[14] \land \texttt{0x1ffff}) >> 2))$
+  \STATE $C[0] \gets C[0] \oplus ((C[7] >> 9) \lor (C[8] << 23))$
+  \STATE $C[1] \gets C[1] \oplus ((C[8] >> 9) \lor (C[9] << 23))$
+  \STATE $C[2] \gets C[2] \oplus ((C[9] >> 9) \lor (C[10] << 23))$
+  \STATE $C[3] \gets C[3] \oplus ((C[10] >> 9) \lor (C[11] << 23))$
+  \STATE $C[4] \gets C[4] \oplus ((C[11] >> 9) \lor (C[12] << 23))$
+  \STATE $C[5] \gets C[5] \oplus ((C[12] >> 9) \lor (C[13] << 23))$
+  \STATE $C[6] \gets C[6] \oplus ((C[13] >> 9) \lor (C[14] << 23))$
+  \STATE $C[7] \gets C[7] \oplus ((C[14] \land \texttt{0x3fe00}) >> 9)$
+  \RETURN $C$
+  \caption{Reduction algorithm for $x^{233} + x^{74} + 1$ with 32-bit words}
+  \label{alg:233-32:word:operation}
+\end{algorithmic}
+\end{algorithm}
