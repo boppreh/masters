@@ -2,36 +2,53 @@
 
 In the previous chapters we discussed algorithms that operated on finite field elements as if they were made of individual bits (the binary coefficients). This is a sensible approach for building circuits, as the bits map naturally to simple signals, allowing the circuits to be constructed with basic logic gates. \\
 
-However, during our research we also studied $GF(2^m)$ arithmetic for CPUs, where the individual bit approach is not efficient. In theory software could also operate on individual bits of each element, but this would require multiple instructions to process each bit, not to mention additional overhead on architecture incapable of addressing single bits. \\
+However, during our research we also studied $GF(2^m)$ arithmetic for CPUs, where the individual bit approach is not efficient. In theory software could also operate on individual bits of each element, but this would require multiple instructions to process each bit, not to mention additional overhead on architectures incapable of addressing single bits. \\
 
-On software implementations, the more sensible approach is to group the coefficients into CPU words (see Fig.~\ref{fig_simple_words}). Because this introduces a new layer of complexity, we decided to focus on the small but important area of polynomial reduction modulo a trinomial, a common operation in $\F_2[x]/(x^m+x^a+1)$. \\
+On software implementations, the more sensible approach is to group the coefficients into CPU words. Given a polynomial $\sum_{i=0}^{m-1} d_i x^i$, we group the bits in words $D[0] \ldots D[t-1]$, each of length $W$, starting from $d_0 \ldots d_{W-1}$ (see Fig.~\ref{fig:word:simple_words}). However, this representation introduces a new layer of complexity to algorithms. Therefore, we decided to focus on the small but important area of polynomial reduction modulo a trinomial, a common operation in $\F_2[x]/(x^m+x^a+1)$. \\
 
 \begin{figure}
-  \caption{Representation of a binary field element with bits divided into words.}
-  \label{fig:simple_words}
-  \includegraphics[width = .55\columnwidth]{figures/element-word.pdf}
+  \caption{Representation of a binary field element $\sum_{i=0}^{m-1} d_i x^i$ with bits divided into words $D[0] \ldots D[t-1]$.}
+  \label{fig:word:simple_words}
+  \centering
+  \includegraphics[width = .90\columnwidth]{figures/element-word.pdf}
 \end{figure}
 
-This operation has some important practical applications. Using a trinomial as irreducible polynomial is  preferred when available because it maximizes the number of zero coefficients in the the irreducible polynomial, enabling numerous simplifications. And the reduction operation is an important step for multiplications and exponentiations, making speedups desirable.
+This operation has some important practical applications. Using a trinomial as irreducible polynomial is preferred when available because it maximizes the number of zero coefficients in the the irreducible polynomial, enabling numerous simplifications. And the reduction operation is an important step for multiplications and exponentiations, making speedups desirable.\\
+
+This chapter requires more notations and assumptions to represent CPU algorithms and words. We assume that one word has $W$ bits, where $W$ is a multiple of $8$. The bits of a word $A$ are numbered from $0$ to $W-1$, with the rightmost bit corresponding to the $x^0$ coefficient (LSB) of $A$ designated as bit $0$. The following standard notation is used to denote operations on words $A$ and $B$:\\
+
+\begin{description}
+\item[$A \BitXOR B$] bitwise exclusive or.
+\item[$A \BitOr B$]  bitwise or. 
+\item[$A \BitAnd B$]      bitwise $AND$.
+\item[$A \ShiftLeft n$]      left shift of $A$ by $n$ positions, ($n<W$), with the bits from 0 to $n-1$ set to $0$. 
+\item[$A\ShiftRight n$]     righ shift of $A$ by $n$ positions, ($n<W$), with bits from $W-n$ to $W-1$ set to $0$. 
+\end{description}
+
+And the following variable naming:
+
+\begin{description}
+\item[$a, b, c, d$]  Polynomials in $\F_2[x]$, not necessarily an element of the field $\F_{2^m}$ (they may be an intermediate result before the final reduction).
+\item[$A, B, C, D$]  Vector of bits corresponding to the polynomials $a, b, c, d$.
+\end{description}
+
+In Section~\ref{operating-on-words} we give more details on the general differences of bit and word algorithms for this application. Section~\ref{delay-independence} shows an example of such difference. Section~\ref{bit-grouping} details the different cases of bit-grouping and how they lie across word boundaries. Section~\ref{helper-functions} contains helper functions that can be used to easily convert a bit-oriented algorithm to a word-oriented one.
 
 \section{Operating on words}\label{operating-on-words}
 
-Manipulation of individual bits is not efficient in most CPU architectures. In general, it is preferred to operate on words, with a size specific to the microprocessor architecture, such as $32$- or $64$-bit words. However, the reduction algorithms are strongly bit oriented, since the coefficients are not naturally grouped in words. The codification of these algorithms to word oriented programming languages usually adds some complexity in terms of bitwise shifts and masks, and doesn't enjoy the parallelism inherent in XOR circuits. Specific techniques that help us in this coding have been proposed in the literature\cite{Hilewitz2008}. 
+Manipulation of individual bits is not efficient in most CPU architectures. In general, it is preferred to operate on words, with a size specific to the microprocessor architecture, such as $32$- or $64$-bit words. However, the reduction algorithms are strongly bit oriented, since the coefficients are not naturally grouped in words. The codification of these algorithms to word oriented programming languages usually adds some complexity in terms of bitwise shifts and masks, and doesn't enjoy the parallelism inherent in XOR circuits. Specific techniques that help us in this coding have been proposed in the literature\cite{Hilewitz2008}.  \\
 
-In this scenario it's often desirable to have "interoperability", choosing a field size and a irreducible polynomial that leads to efficient operations
-in both hardware and software implementations. A straightforward
-approach to this problem is to develop a hardware implementation first,
-XOR'ing individual bits, and convert the algorithm to words. This can be
-thought of as parallelizing the operations, with SHIFTs and AND/OR masks
-for alignment. This is the approach used in this document.
+In this scenario it's often desirable to have "interoperability", choosing a field size and a irreducible polynomial that leads to efficient operations in both hardware and software implementations. A straightforward approach to this problem is to develop a hardware implementation first, XOR'ing individual bits, and convert the algorithm to words. This can be thought of as parallelizing the operations, with SHIFTs and AND/OR masks for alignment. This is the approach used in this work. \\
 
-The word-oriented algorithm can be helped by choosing specific field sizes and irreducible polynomials that introduce operations aligning at word boundaries, to avoid these bitwise shifts and masks, or that map well to architecture-specific operations. In our algorithms we try to make use of alignment opportunities when they appear, but do not depend on them or any specific architecture.
+The difficulty of the conversion process greatly varies depending on the access pattern of the algorithm and alignment of words. If all coefficients inside a range are XOR'ed once in a linear fashion, the XOR distance a multiple of the word size, and the start and end range lie in word boundaries, the converted algorithm gains a full speedup of up to \texttt{WORD\_SIZE} times {[}$C_{word} = \ceil*{\frac{C_{bit}}{W}}${]}. \\
 
-\section{Delay independence}
+The word-oriented algorithm can be helped by choosing specific field sizes and irreducible polynomials that introduce operations aligning at word boundaries, to avoid these bitwise shifts and masks, or that map well to architecture-specific operations. In our algorithms we try to make use of alignment opportunities when they appear, but do not depend on them or any specific architecture. \\
 
-Performing binary polynomial reduction in a CPU has a few differences from implementing a hardware circuit. For example, circuits often avoid irreducible polynomials with the second largest exponent $a > \ceil{m/2}$. As seen before with pentanomials, this characteristic leads to higher delays in most circuit-based reduction algorithms. This is caused by the inter-dependency of the calculations, limiting the natural parallelism of circuits and thus increases the total delay.
+\section{Delay independence}\label{delay-independence}
 
-This property does not affect software implementations. To illustrate this, we take two algorithms that perform modular reduction for the NIST irreducible trinomials $x^{233} + x^{74} + 1$ and $x^{409} + x^{87} + 1$~\cite[p. 55]{hankerson2006guide}. Then we manually adapt each of these algorithms to perform a reduction modulo its reciprocal, $x^m + x^{a-m} + 1$. Notice the only change required is in the indexing and bitwise shifts. The total number of operations remains the same. Algorithms meant for circuit implementations, on the other hand, would have different delay characteristics on each version. % Muito pouco. Expandir. Mostrar diferenças linha-a-linha.
+Performing binary polynomial reduction in a CPU has a few differences from implementing a hardware circuit. For example, circuits often avoid irreducible polynomials with the second largest exponent $a > \ceil{m/2}$. As seen before with pentanomials, this characteristic leads to higher delays in most circuit-based reduction algorithms. This is caused by the inter-dependency of the calculations, limiting the natural parallelism of circuits and thus increases the total delay. \\
+
+This property does not affect software implementations. To illustrate this, we take two algorithms that perform modular reduction for the NIST irreducible trinomials $x^{233} + x^{74} + 1$ and $x^{409} + x^{87} + 1$~\cite[p. 55]{hankerson2006guide}. Then we manually adapt each of these algorithms to perform a reduction modulo its reciprocal, $x^m + x^{a-m} + 1$. Notice the only change required is in the indexing and bitwise shifts. The total number of operations remains the same. Algorithms meant for circuit implementations, on the other hand, would have different delay characteristics on each version. \\ % Muito pouco. Expandir. Mostrar diferenças linha-a-linha.
 
 % Explicar melhor os algoritmos.
 
@@ -126,21 +143,7 @@ This property does not affect software implementations. To illustrate this, we t
 \end{algorithmic}
 \end{algorithm}
 
-\section{Notations}
-
-In this paper, we assume that one word has $W$ bits where $W$ is a multiple of $8$. The bits of a word $A$ are numbered from $0$ to $W-1$, with the rightmost bit corresponding to the $x^0$ coefficient (LSB) of $A$ designated as bit $0$. The following standard notation is used to denote operations on words $A$ and $B$:\\
-
-\begin{description}
-\item[$A \BitXOR B$] bitwise exclusive or.
-\item[$A \BitOr B$]  bitwise or. 
-\item[$A \BitAnd B$]      bitwise $AND$.
-\item[$A \ShiftLeft n$]      left shift of $A$ by $n$ positions, ($n<W$), with the bits from 0 to $n-1$ set to $0$. 
-\item[$A\ShiftRight n$]     righ shift of $A$ by $n$ positions, ($n<W$), with bits from $W-n$ to $W-1$ set to $0$. 
-\item[$a, b, c, d$]  Polynomials in $\F_2[x]$, not necessarily an element of the field $\F_{2^m}$ (they may be an intermediate result before the final reduction).
-\item[$A, B, C, D$]  Vector of bits corresponding to the polynomials $a, b, c, d$.
-\end{description}
-
-\section{Bit grouping}
+\section{Bit grouping}\label{bit-grouping}
 
 Figure~\ref{fig:elemento:field} shows the representation of a element $d \in \ftwom$ as an array $D$ of $t$ words of $W$ bits, where $t = \left \lceil \frac{m}{W} \right \rceil$. The $s = tW-m$ highest order bits of $D[t-1]$ are not unused.
 \begin{figure}[htb]
@@ -170,3 +173,124 @@ When $(m-1) \mod{W} \leq \frac{W}{2}$, $D[2t-1]$ is not needed.  Figure~\ref{fig
 \end{figure}
 
 In these cases a whole word is wasted, but length calculations become simpler: to get the length (in words) of a product of two elements, just add their lengths (in words).
+
+
+\section{Helper functions for conversion} \label{helper-functions}
+
+The word-oriented versions of the algorithm can be created by noticing the bit access pattern. The XOR operation pattern can be thought of XORing two ranges.
+
+Each of them perform a XOR operation between all bits in a certain range and counterparts a fixed distance away. This access pattern allows word-level parallelism. There are four issues that need to be paid attention to:
+
+\textbf{Misaligned start:}
+The loop starts at $2m -2$, which may not align with the word length ($W \nmid 2m-2$). To avoid overwriting the upper bits of this incomplete word we must clear them from the \texttt{src} word.
+
+\textbf{Misaligned ends:}
+The fix is identical to the misaligned start, where we clear the extra bits from the incoming word.
+
+\textbf{Misaligned source:}
+The source/incoming word may not be aligned to word boundaries either. In this case we need to pull bits from the next word too, shifting both of them for correct placement. Unfortunately this issue affects the start and ends word too, further complicating their treatment.
+
+\textbf{Too small distances:}
+Finally, if the distance between the XOR'ed words ($m-a$, $m$, respectively) is smaller than $W/2$, the same bit will be written and read in the same word-step. This is not possisble with a single operation, and requires handling each word in mulitple parts. This is suboptimal and should be avoided by better choices of $m$, $a$ and $W$.
+
+Other bit-level operations are emulated with word masks and shifts.
+
+To help transforming an algorithm in its word-parallel version we introduce the following helper functions. Notice the function calls can be inlined and all conditionals are open for static analysis (the final algorithm should contain no conditionals if optimized properly).
+
+\begin{algorithm}
+\begin{algorithmic}[1]
+  \REQUIRE $dst$, $src$, $W$, $C[]$
+  \STATE $mask \gets 1 << (src \mod W)$
+  \STATE $C[dst / W] \gets C[dst / W] \oplus (C[src / W] \land mask) << (dst \mod W - src \mod W)$
+  \caption{\texttt{XOR\_BIT}: Single bit XOR inside word}
+\end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}
+\begin{algorithmic}[1]
+  \REQUIRE $dst$, $src$, $W$, $C[]$
+  \STATE $left \gets C[src / W] >> (src \mod W)$
+  \STATE $right \gets C[src / W + 1] << (W - src \mod W)$
+  \STATE $C[dst / W] \gets C[dst / W] \oplus (left \lor right)$
+  \caption{\texttt{XOR\_WORD}: Whole word XOR with possibly misaligned source}
+\end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}
+\begin{algorithmic}[1]
+  \REQUIRE $dst$, $src$, $n\_bits$, $W$, $C[]$
+  \STATE $shift \gets src \mod W$
+  \STATE $left\_n\_bits \gets \min(n\_bits, W - shift)$
+  \STATE $leftmask \gets ((1 << left\_n\_bits) - 1) << shift$
+  \STATE $left \gets (C[src / W] \land leftmask) >> shift$
+  \STATE $right\_n\_bits \gets n\_bits - left\_n\_bits$
+  \IF{$right\_n\_bits > 0$}
+    \STATE $rightmask \gets (1 << right\_n\_bits) - 1$
+    \STATE $right \gets (C[src/W+1] \land rightmask) << left\_n\_bits$
+  \ELSE
+    \STATE $right \gets 0$
+  \ENDIF
+  \STATE $C[dst/W] = C[dst/W] \oplus ((left | right) << (dst \ W))$
+  \caption{\texttt{XOR\_PARTIAL\_WORD}: XOR a range of bits inside a word, with possibly misaligned source}
+\end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}
+\begin{algorithmic}[1]
+  \REQUIRE $start\_dst$, $end\_dst$, $distance$, $W$, $C[]$
+  \IF{$end\_dst/W = start\_dst/W$}
+    \STATE \texttt{XOR\_PARTIAL\_WORD}($start\_dst$, $start\_dst + distance$, $end\_dst - start\_dst$, $W$, $C$)
+  \ELSE
+    \IF{$start\_dst \ W \neq 0$}
+      \STATE $remaining = W - (start\_dst \ W)$
+      \STATE \texttt{XOR\_PARTIAL\_WORD}($start\_dst$, $start\_dst + distance$, $remaining$, $W$, $C$)
+      \STATE $start\_dst \gets start\_dst + remaining$
+    \ENDIF
+    
+    \STATE $rounded\_end \gets (end\_dst / W) * W$
+    \STATE $dst \gets start\_dst$
+    \WHILE{$dst < rounded\_end$}
+      \STATE \texttt{XOR\_WORD}($dst$, $dst + distance$, $W$, $C$)
+      \STATE $dst \gets dst + W$
+    \ENDWHILE
+    
+    \IF{$end\_dst \ W \neq 0$}
+      \STATE \texttt{XOR\_PARTIAL\_WORD}($rounded\_end$, $rounded\_end + distance$, $end\_dst \ W$, $W$, $C$)
+    \ENDIF
+  \ENDIF
+  \caption{\texttt{XOR\_RANGE}: XOR a range of bits (across many words) with an equivalent range a certain distance away}
+\end{algorithmic}
+\end{algorithm}
+
+
+And the word-transformed algorithms are:
+
+\begin{algorithm}
+\begin{algorithmic}[1]
+  \REQUIRE $m$, $a$, $W$, $C\left[0,\ceil*{\frac{2m-2}{W}}\right]$
+  \ENSURE $C[0,m-1]$
+  \STATE \texttt{XOR\_RANGE}($a$, $a+m$, $m$, $W$, $C$)
+  \STATE \texttt{XOR\_RANGE}($0$, $a-1$, $m$, $W$, $C$)
+  \RETURN $C$
+  \caption{Simple word-parallel reduction algorithm for $x^m + x^a +1$, $a = \frac{m}{2}$}
+  \label{alg:equallyspaced:word:operation}
+\end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}
+\begin{algorithmic}[1]
+  \REQUIRE $m$, $a$, $W$, $C\left[0,\ceil*{\frac{2m-2}{W}}\right]$
+  \ENSURE $C[0,m-1]$
+  \STATE $start\_src \gets m$
+  \STATE $step\_size \gets m - a$
+  \WHILE{$start\_src \le 2m - 2$}
+    \STATE \texttt{XOR\_RANGE}($a$, $a + 2m-2 - start\_src$, $start\_src - a$, $W$, $C$)
+    \STATE $start\_src \gets start\_src + step\_size$
+    \STATE $step\_size \gets 2 \times step\_size$
+  \ENDWHILE
+  \STATE \texttt{XOR\_RANGE}($0$, $m$, $m$, $W$, $C$)
+  \RETURN $C$
+  \caption{Alternative reduction algorithm, uses more XORs but less calls to \texttt{XOR\_RANGE}, may be useful for certain architectures.}
+  \label{alg:new:word:operation}
+\end{algorithmic}
+\end{algorithm}
