@@ -204,6 +204,48 @@ Finally, this visualization tool was made to include testing of algorithms. At f
 \end{figure}
 
 
+\section{Algorithm specific visualization}
+
+The previous tools were suited for exploring the behavior of irreducible polynomials when used for reduction. However, we still needed to analyze the specific behavior of our algorithm, such as circuit delay and number of logic gates.
+
+To achieve this we created a separate version of the visualizatiom tool where the logic gates connected according to our proposed algorithm. Notice however that the circuit shown is not accurate about the positioning of the logic gates, only their number and connections.
+
+Figure~\ref{fig:circuit-reducing-7-3-0} shows the resulting circuit of applying Algorithm~\ref{reductionalgorithm} to $x^7 + x^3 + 1$. The vertical lines represent the inputs, with the line numbered $i$ representing the coefficient $c_i$ of the polynomial to be reduced. The $\oplus$  connectors perform bit-wise XOR of the upper and left inputs, with the resulting signal on the bottom wire. The numbers at the bottom represent the length of the critical path on that output, a measure proportional do the circuit delay. Note the operations are equivalent to the ones described in Figure~\ref{fig:visual:new}, but with common sub-expression being grouped.
+
+\begin{figure}
+  \caption{Visualization tool for generated reduction circuits, showing the reduction circuit for the irreducible polynomial $x^7 + x^3 + 1$.}
+  \label{fig:circuit-reducing-7-3-0}
+  \centering
+  \includegraphics[width = .8\columnwidth]{figures/reducing-7-3-0.png}
+\end{figure}
+
+This tool was also adapted for Algorithm~\ref{squaringalgorithm}, showing the resulting circuit optimized for squaring. Note that the number of operations is much smaller, and that odd-numbered coefficients are skipped. However, in this case the circuit delay remains the same (2 times the delay of a XOR gate).
+
+\begin{figure}
+  \caption{Visualization tool for generated squaring circuits, showing the reduction circuit for the irreducible polynomial $x^7 + x^3 + 1$.}
+  \label{fig:circuit-squaring-7-3-0}
+  \centering
+  \includegraphics[width = .8\columnwidth]{figures/squaring-7-3-0.png}
+\end{figure}
+
+The visualization can be used for any desired polynomial, including pentanomials. In this case the results are naturally more complex, as seen in Figure~\ref{fig:circuit-reducing-7-6-1-0}, which shows a reduction circuit for $x^7 + x^6 + x + 1$.
+
+\begin{figure}
+  \caption{Visualization tool for generated reduction circuits, showing the reduction circuit for the irreducible polynomial $x^7 + x^6 + x^2 + x + 1$.}
+  \label{fig:circuit-reducing-7-6-2-1-0}
+  \centering
+  \includegraphics[width = 1\columnwidth]{figures/reducing-7-6-2-1-0.png}
+\end{figure}
+
+One of the issues with our proposed algorithm is that the delay is sometimes worse than the state of the art. This can be remediated by moving the connections and inserting extra XOR gates, but doing this analysis by hand is cumbersome. Therefore we added a feature to highlight the gates used on each output, and mark the ones that make up the critical path. This highlighting feature can be seen in Figure~\ref{fig:circuit-reducing-critical-7-6-1-0}, where the 6 XOR gates in the critical path are shown in red.
+
+\begin{figure}
+  \caption{Visualization tool for generated reduction circuits, showing the reduction circuit for the irreducible polynomial $x^7 + x^6 + x^2 + x + 1$. The critical path of output 6 is highlighted.}
+  \label{fig:circuit-reducing-critical-7-6-2-1-0}
+  \centering
+  \includegraphics[width = .8\columnwidth]{figures/reducing-critical-7-6-2-1-0.png}
+\end{figure}
+
 \section{Conclusion} \label{section:visual:conclusion}
 
 In this chapter we presented the visualization tool used during our research. This tool was invaluable in efficiently exploring and testing new ideas related to reduction of binary polynomials. The intuitive visuals and quick feedback allowed even people unfamiliar with the subjects to help find interesting properties.
@@ -211,3 +253,5 @@ In this chapter we presented the visualization tool used during our research. Th
 The development itself of the tool also acted to clarify concepts. For example the fact that each irreducible polynomial has a mathematical "pattern" associated, corresponding to the XORs required for reduction, and that these operations are independent of the algorithm used. The word processing and squaring versions saw less use, but creating them helped guide some of the research.
 
 Interestingly, some time after having developed the tool, we found another researching using the same visualization of patterns, for the same problem~\cite{paper_com_imagens_dos_padroes}.
+
+The algorithm-specific version of the visualization tool was also helpful. It lead to deeper insights on the behavior of our proposed algorithm, and to create hand-modified circuits with lower delays.
