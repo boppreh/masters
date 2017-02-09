@@ -210,38 +210,38 @@ The previous tools were suited for exploring the behavior of irreducible polynom
 
 To achieve this we created a separate version of the visualizatiom tool where the logic gates connected according to our proposed algorithm. Notice however that the circuit shown is not accurate about the positioning of the logic gates, only their number and connections. \\
 
-Figure~\ref{fig:circuit-reducing-7-3-0} shows the resulting circuit of applying Algorithm~\ref{reductionalgorithm} to $x^7 + x^3 + 1$. The vertical lines represent the inputs, with the line numbered $i$ representing the coefficient $c_i$ of the polynomial to be reduced. The $\oplus$  connectors perform bit-wise XOR of the upper and left inputs, with the resulting signal on the bottom wire. The numbers at the bottom represent the length of the critical path on that output, a measure proportional do the circuit delay. Note the operations are equivalent to the ones described in Figure~\ref{fig:visual:new}, but with common sub-expression being grouped. \\
+Figure~\ref{fig:circuit_reducing_7_3_0} shows the resulting circuit of applying Algorithm~\ref{alg:reduce} to $x^7 + x^3 + 1$. The vertical lines represent the inputs, with the line numbered $i$ representing the coefficient $c_i$ of the polynomial to be reduced. The $\oplus$  connectors perform bit-wise XOR of the upper and left inputs, with the resulting signal on the bottom wire. The numbers at the bottom represent the length of the critical path on that output, a measure proportional do the circuit delay. Note the operations are equivalent to the ones described in Figure~\ref{fig:visual:new}, but with common sub-expression being grouped. \\
 
 \begin{figure}
   \caption{Visualization tool for generated reduction circuits, showing the reduction circuit for the irreducible polynomial $x^7 + x^3 + 1$.}
-  \label{fig:circuit-reducing-7-3-0}
+  \label{fig:circuit_reducing_7_3_0}
   \centering
   \includegraphics[width = .8\columnwidth]{figures/reducing-7-3-0.png}
 \end{figure}
 
-This tool was also adapted for Algorithm~\ref{squaringalgorithm}, showing the resulting circuit optimized for squaring. Note that the number of operations is much smaller, and that odd-numbered coefficients are skipped. However, in this case the circuit delay remains the same (2 times the delay of a XOR gate). \\
+This tool was also adapted for Algorithm~\ref{alg:square}, showing the resulting circuit optimized for squaring in Figure~\ref{fig:circuit_squaring_7_3_0}. Note that the number of operations is much smaller, and that odd-numbered coefficients are skipped. However, in this case the circuit delay remains the same (2 times the delay of a XOR gate). \\
 
 \begin{figure}
   \caption{Visualization tool for generated squaring circuits, showing the reduction circuit for the irreducible polynomial $x^7 + x^3 + 1$.}
-  \label{fig:circuit-squaring-7-3-0}
+  \label{fig:circuit_squaring_7_3_0}
   \centering
   \includegraphics[width = .8\columnwidth]{figures/squaring-7-3-0.png}
 \end{figure}
 
-The visualization can be used for any desired polynomial, including pentanomials. In this case the results are naturally more complex, as seen in Figure~\ref{fig:circuit-reducing-7-6-1-0}, which shows a reduction circuit for $x^7 + x^6 + x + 1$.
+The visualization can be used for any desired polynomial, including pentanomials. In this case the results are naturally more complex, as seen in Figure~\ref{fig:circuit_reducing_7_6_1_0}, which shows a reduction circuit for $x^7 + x^6 + x + 1$.
 
 \begin{figure}
   \caption{Visualization tool for generated reduction circuits, showing the reduction circuit for the irreducible polynomial $x^7 + x^6 + x^2 + x + 1$.}
-  \label{fig:circuit-reducing-7-6-2-1-0}
+  \label{fig:circuit_reducing_7_6_1_0}
   \centering
   \includegraphics[width = 1\columnwidth]{figures/reducing-7-6-2-1-0.png}
 \end{figure}
 
-One of the issues with our proposed algorithm is that the delay is sometimes worse than the state of the art. This can be remediated by moving the connections and inserting extra XOR gates, but doing this analysis by hand is cumbersome. Therefore we added a feature to highlight the gates used on each output, and mark the ones that make up the critical path. This highlighting feature can be seen in Figure~\ref{fig:circuit-reducing-critical-7-6-1-0}, where the 6 XOR gates in the critical path are shown in red. \\
+One of the issues with our proposed algorithm is that the delay is sometimes worse than the state of the art. This can be remediated by moving the connections and inserting extra XOR gates, but doing this analysis by hand is cumbersome. Therefore we added a feature to highlight the gates used on each output, and mark the ones that make up the critical path. This highlighting feature can be seen in Figure~\ref{fig:circuit_reducing_critical_7_6_1_0}, where the 6 XOR gates in the critical path are shown in red. \\
 
 \begin{figure}
   \caption{Visualization tool for generated reduction circuits, showing the reduction circuit for the irreducible polynomial $x^7 + x^6 + x^2 + x + 1$. The critical path of output 6 is highlighted.}
-  \label{fig:circuit-reducing-critical-7-6-2-1-0}
+  \label{fig:circuit_reducing_critical_7_6_1_0}
   \centering
   \includegraphics[width = .8\columnwidth]{figures/reducing-critical-7-6-2-1-0.png}
 \end{figure}

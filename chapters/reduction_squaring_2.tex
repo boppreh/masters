@@ -13,7 +13,7 @@ Although our algorithms hold for any low-weight polynomial, to achieve better ci
 
 Our squarer has different costs depending on the irreducible polynomial used. Applications requiring utmost efficiency should choose an irreducible polynomial to minimize the global cost of operations. We observe there are polynomials that minimize the number of XOR operations and delay with our squarer; we show that low-weight polynomials with this characteristic are abundant (see Table~\ref{table:comparison_squarer} at Section~\ref{comparison}). Additionally, our squarer can be used for higher weight polynomials, with some performance penalty.\\
 
-The structure of the next sections is as follows. In Section \ref{modrec}, we present a general algorithm to perform modular reduction. This algorithm is generic and can be used with any irreducible polynomial. In Section \ref{squaring}, we modify the algorithm previously proposed to make it a squarer. This strategy allowed us to propose a squarer algorithm of low complexity. In Section \ref{comparison}, we compare our squarer with previous methods for this operation. Section~\ref{pth} shows how the reduction and squaring algorithm can be generalized for $p$-th power computation in characteristic $p$. We give final conclusions in Section \ref{conclusion}. \\
+The structure of the next sections is as follows. In Section \ref{modrec}, we present a general algorithm to perform modular reduction. This algorithm is generic and can be used with any irreducible polynomial. In Section \ref{squaring}, we modify the algorithm previously proposed to make it a squarer. This strategy allowed us to propose a squarer algorithm of low complexity. In Section \ref{comparison}, we compare our squarer with previous methods for this operation. Section~\ref{pth} shows how the reduction and squaring algorithm can be generalized for $p$-th power computation in characteristic $p$. \\
 
 \section{Modular reduction} \label{modrec}
 
@@ -217,7 +217,7 @@ $x^{571} + x^{10} + x^5 + x^2 + 1$ & $2,280\oplus/~4T_X$ & $\leq898\oplus/~\leq3
 \end{tabular}}{}
 \end{table}
 
-\section{Generalized reduction and squaring in $GF(\MakeLowercase{p}^\MakeLowercase{m})$}
+\section{Generalized reduction and squaring in $GF(\MakeLowercase{p}^\MakeLowercase{m})$} \label{pth}
 
 We recall that the reduction can be performed by iteratively computing $C(x) \leftarrow C(x) + c_{i} x^{i-m} f(x)$ for $i = d, d-1, \ldots, m$. This is sufficient to reduce polynomials in binary fields, but can be easily generalized to other finite field characteristics. \\
 

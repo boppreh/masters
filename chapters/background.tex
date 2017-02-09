@@ -4,7 +4,7 @@ For this work it is necessary to have a detailed understanding of finite fields,
 
 Finite fields have numerous applications in cryptography. We are mostly concerned with its use as low level primitive, and the performance of its arithmetic operations. One example of area that is benefited from this research is Elliptic Curve Cryptography, where the point computations are performed on fields such as the ones presented here. \\
 
-This chapter is an introduction to the concepts that we will build upon. In Section~\ref{background:finite_fields} we explain the very basics of finite fields, trying to build an intuition of the structures involved. In Section~\ref{background:polynomial_representation} we focus on fields constructed from polynomials, and how to represent them. Section~\ref{background:arithmetic} explains the basics of arithmetic on binary polynomial basis, with some useful properties. Finally, in Section~\ref{background:binary} details where and how this type of arithmetic is used in practice. \\
+This chapter is an introduction to the concepts that we will build upon. In Section~\ref{background:finite_fields} we explain the very basics of finite fields, trying to build an intuition of the structures involved. In Section~\ref{background:polynomial_representation} we focus on fields constructed from polynomials, and how to represent them. Section~\ref{background:arithmetic} explains the basics of arithmetic on binary polynomial basis, with some useful properties. Finally, Section~\ref{stateoftheart} shows the performance of state of the art algorithms for squaring and reduction. \\
 
 \section{Finite fields} \label{background:finite_fields}
 
@@ -100,11 +100,11 @@ D \equiv C \mod f\\
 This function, $\texttt{reduce}(C, x^m+...+1) = D$ is the main focus of this work, as it is generalized and used for efficient exponentiations.
 
 
-\section{State of the art}
+\section{State of the art} \label{stateoftheart}
 
-Algorithms for reduction and squaring in binary fields usually require only bitwise XOR opeartions. Their efficiency is then measured by a function of $m$, for irreducible polynomials of a certain class. Additionally, circuit algorithms are concerned with the critical path delay, measured as the number of XOR operations found in the longest path in the circuit. \\
+Algorithms for reduction and squaring in binary fields usually require only bitwise XOR operations. Their efficiency is then measured by a function of $m$, for irreducible polynomials of a certain class. Additionally, circuit algorithms are concerned with the critical path delay, measured as the number of XOR operations found in the longest path in the circuit. \\
 
-For example, Table~\ref{table:comparison_squarer_background} compares the effiency of two algorithms from the literature. The algorithms are optimized for small subsets of all irreducible pentanomials, thus the total number of suitable polynomials that exist. \\
+For example, Table~\ref{table:comparison_squarer_background} compares the efficiency of two algorithms from the literature. The algorithms are optimized for small subsets of all irreducible pentanomials, thus the total number of suitable polynomials that exist. \\
 
 \begin{table}
 \centering
@@ -117,7 +117,7 @@ Proposal / Polynomials & \# irreducible & XOR count / Delay  \\ \hline
 \end{tabular}}{}
 \end{table}
 
-Another class of interesting reduction algorithms are the ones that operate on NIST polynomials. NIST is the American National Insitute of Standards and Technolgoy, and is known for promoting cryptographic standards such as preferred finite fields for elliptic curves. \\
+Another class of interesting reduction algorithms are the ones that operate on NIST polynomials. NIST is the American National Institute of Standards and Technology, and is known for promoting cryptographic standards such as preferred finite fields for elliptic curves. \\
 
 Because these fields are standardized, they attract special attention from researchers looking to optimize arithmetic operations. The state of the art for squaring modulo a NIST pentanomial, for example, is from Park \cite{park2012explicit}. The performance of the algorithm is available at Table~\ref{table:comparison_nist_background}, and a comparison to naive reduction.
 
