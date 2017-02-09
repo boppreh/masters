@@ -1,14 +1,14 @@
 \section{Introduction}
 
-For this work it is necessary to have a detailed understanding of finite fields, and how they implemented as primitives for higher level cryptographic structures. Here we focus on a specific type of field, polynomial fields. Furthermore, out of the possible representations we narrow our research to polynomial basis.
+For this work it is necessary to have a detailed understanding of finite fields, and how they implemented as primitives for higher level cryptographic structures. Here we focus on a specific type of field, polynomial fields. Furthermore, out of the possible representations we narrow our research to polynomial basis. \\
 
-Finite fields have numerous applications in cryptography. We are mostly concerned with its use as low level primitive, and the performance of its arithmetic operations. One example of area that is benefited from this research is Elliptic Curve Cryptography, where the point computations are performed on fields such as the ones presented here.
+Finite fields have numerous applications in cryptography. We are mostly concerned with its use as low level primitive, and the performance of its arithmetic operations. One example of area that is benefited from this research is Elliptic Curve Cryptography, where the point computations are performed on fields such as the ones presented here. \\
 
-This chapter is an introduction to the concepts that we will build upon. In Section~\ref{background:finite_fields} we explain the very basics of finite fields, trying to build an intuition of the structures involved. In Section~\ref{background:polynomial_representation} we focus on fields constructed from polynomials, and how to represent them. Section~\ref{background:arithmetic} explains the basics of arithmetic on binary polynomial basis, with some useful properties. Finally, in Section~\ref{background:binary} details where and how this type of arithmetic is used in practice.
+This chapter is an introduction to the concepts that we will build upon. In Section~\ref{background:finite_fields} we explain the very basics of finite fields, trying to build an intuition of the structures involved. In Section~\ref{background:polynomial_representation} we focus on fields constructed from polynomials, and how to represent them. Section~\ref{background:arithmetic} explains the basics of arithmetic on binary polynomial basis, with some useful properties. Finally, in Section~\ref{background:binary} details where and how this type of arithmetic is used in practice. \\
 
 \section{Finite fields} \label{background:finite_fields}
 
-A Finite Field $\F_{p^m}$ (also known as Galois Field $GF(p^m)$) is an abstract mathematical structure composed of a set of elements and two operators:
+A Finite Field $\F_{p^m}$ (also known as Galois Field $GF(p^m)$) is an abstract mathematical structure composed of a set of elements and two operators: 
 
 \begin{gather*}
 \F_{p^m} = (\{A_0, A_1, A_2, ... A_{p^m-1}\}, +, \cdot),
@@ -100,7 +100,9 @@ D \equiv C \mod f\\
 This function, $\texttt{reduce}(C, x^m+...+1) = D$ is the main focus of this work, as it is generalized and used for efficient exponentiations.
 
 
-\section{NIST Polynomials and their costs}
+\section{State of the art}
+
+% TODO
 
 NIST Binary Polynomials and their costs (Guide to Elliptic Curve Crytography - Hankerson - page 76
 

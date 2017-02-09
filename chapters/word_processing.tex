@@ -4,7 +4,7 @@ In the previous chapters we discussed algorithms that operated on finite field e
 
 However, during our research we also studied $GF(2^m)$ arithmetic for CPUs, where the individual bit approach is not efficient. In theory software could also operate on individual bits of each element, but this would require multiple instructions to process each bit, not to mention additional overhead on architectures incapable of addressing single bits. \\
 
-On software implementations, the more sensible approach is to group the coefficients into CPU words. Given a polynomial $\sum_{i=0}^{m-1} d_i x^i$, we group the bits in words $D[0] \ldots D[t-1]$, each of length $W$, starting from $d_0 \ldots d_{W-1}$ (see Fig.~\ref{fig:word:simple_words}). However, this representation introduces a new layer of complexity to algorithms. Therefore, we decided to focus on the small but important area of polynomial reduction modulo a trinomial, a common operation in $\F_2[x]/(x^m+x^a+1)$. \\
+On software implementations, the more sensible approach is to group the coefficients into CPU words. Given a polynomial $\sum_{i=0}^{m-1} d_i x^i$, we group the bits in words $D[0] \ldots D[t-1]$, each of length $W$, starting from $d_0 \ldots d_{W-1}$ (see Fig.~\ref{fig:word:simple_words} for one example). However, this representation introduces a new layer of complexity to algorithms. Therefore, we decided to focus on the small but important area of polynomial reduction modulo a trinomial, a common operation in $\F_2[x]/(x^m+x^a+1)$. \\
 
 \begin{figure}
   \caption{Representation of a binary field element $\sum_{i=0}^{m-1} d_i x^i$ with bits divided into words $D[0] \ldots D[t-1]$.}

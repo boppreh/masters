@@ -5,17 +5,15 @@
 
 % Relacionar os objetivos específicos ( cada um deles ) com o que foi feito e onde está isso no trabalho, de forma critica
 
-This work had a twofold goal of being an introduction to finite field arithmetic, and proposing efficient algorithms for this area.
+This work had a twofold goal of being an introduction to finite field arithmetic, and proposing efficient algorithms for this area. \\
 
-We hope to have achieved the first goal by giving a humble but self-contained introduction to the mathematical structures involved. Furthermore, during the presentation of our contributions we tried to keep the development and reasoning behind it as clear as possible. Finally, the visualization tool helps giving intuition to the operations involved, and acting as an exploratory tool.
+We hope to have achieved the first goal by giving a humble but self-contained introduction to the mathematical structures involved. Furthermore, during the presentation of our contributions we tried to keep the development and reasoning behind it as clear as possible. Finally, the visualization tool helps giving intuition to the operations involved, and acting as an exploratory tool. \\
 
-\section{Contributions}
+\section{Conclusion}
 
-Our second goal was to improve finite field based cryptosystems by creating more efficient algorithms. In this area we made three main contributions: an efficient algorithm for reduction modulo any irreducible binary polynomial; a squaring algorithm that requires less operations; and a set of helper functions to translate bit-level algorithms to software implementations.
+Our second goal was to improve finite field-based cryptosystems by creating more efficient algorithms. In this area we made three main contributions: an efficient algorithm for reduction modulo any irreducible binary polynomial; a squaring algorithm that requires less operations; and a set of helper functions to translate bit-level algorithms to software implementations. \\
 
-Our reduction algorithm is not more efficient than the state of the art, but is more general.
-
-\section{Conclusion} \label{conclusion}
+Our reduction algorithm is not more efficient than the state of the art, but is more general. This gives more flexibility on the choice of irreducible polynomial, which can be used to optimize other properties of the field structure, or to avoid weak structures. \\
 
 In this work we present a low-complexity bit-parallel squarer algorithm. It is able to match the state of the art~\cite{wu2002bit} in XOR gate count when $GF(2^m)$ is defined using trinomials. Xiong~\cite{xiong2014gf} achieves lower XOR gate complexity when pentanomials are used; however it uses a special polynomial basis and is suitable to only a small fraction of all irreducible pentanomials, while ours is general for any low-weight polynomial.\\
 
@@ -24,15 +22,19 @@ We remark that our squarer works for any general low-weight $k$-nomial. As menti
 
 One disadvantage of our proposed squarer is that it may produce higher delays, up to $6 T_X$ for pentanomials. This can be mitigated in two ways. First, by narrowing the selection of irreducible pentanomial. Indeed,  pentanomials that result in a delay of $3 T_X$ are abundant. Second, the resulting circuit can be modified to reduce the delay in exchange for some extra XORs. An automated way to perform this tweak is still an open problem, as is the exact formula for circuit delays.\\
 
-In conclusion, our algorithms give more freedom to select irreducible polynomials while maintaining competitive efficiency.
+We also researched analogous word-level algorithms. Unfortunately we were not able to create algorithms with better efficiency than the state of the art. Still, our research yielded useful knowledge and tools for automatically adapting bit-level algorithms. \\
 
-\section{Future works}
+Finally, our visualization tool was a surprisingly useful to get a better understanding of the problem. It enabled us to move faster during the exploratory phase, and removed classes of errors by automating analysis processes. \\
 
-\begin{itemize}
-	\item Create a full multiplication algorithm that makes use of our reduction algorithm.
-	\item Enhance visualization tool.
-	\item Use squaring and $p$-th power algorithms for arbitrary exponentiation.
-	\item Use SIMD instructions for speeding up the software algorithms.
-	\item Expand on word processing. Try to improve state of the art.
-\end{itemize}
-% Trabalhos futuros: pelos menos apresentar 5 trabalhos futuros
+
+\section{Future work}
+
+Many venues of research were not explored adequately in this work, mainly due to time restrictions. First, our squarer algorithm may be adapted to perform more efficient exponentiations, a technique that has been demonstrated before~\ref{artigo_park_exp}. The contributions on $p$-th power may also be used in similar fashion, but the path is not as clear. \\
+
+Similarly, our reduction algorithm can be adapted to some multiplication algorithms. This could lead to further optimizations by finding common expressions between the reduction and the rest of the multiplication. \\
+
+Our research into word-level algorithms could be greatly improved by the addition of SIMD (Single Instruction Multiple Data) instructions. Although not available in every platform, such instructions can drastically enhance the performance of algorithms like this. It would also be interesting to see the helper functions applied to other kinds of algorithms. \\
+
+The visualization tool could be adapted to support different types of algorithms and circuits, such as full multiplication algorithms, or finite fields with different characteristics. The circuit visualization version is specific to our proposed algorithm, but could be used for different circuits. \\
+
+Finally, the mathematical introduction to finite fields covers only the minimum necessary to give the background understanding for our research. It could stand to have improvements and additions, and hopefully attract more researchers from our program to this field of study.
