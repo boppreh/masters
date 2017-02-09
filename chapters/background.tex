@@ -102,28 +102,42 @@ This function, $\texttt{reduce}(C, x^m+...+1) = D$ is the main focus of this wor
 
 \section{State of the art}
 
-% TODO
+Algorithms for reduction and squaring in binary fields usually require only bitwise XOR opeartions. Their efficiency is then measured by a function of $m$, for irreducible polynomials of a certain class. Additionally, circuit algorithms are concerned with the critical path delay, measured as the number of XOR operations found in the longest path in the circuit. \\
 
-NIST Binary Polynomials and their costs (Guide to Elliptic Curve Crytography - Hankerson - page 76
+For example, Table~\ref{table:comparison_squarer_background} compares the effiency of two algorithms from the literature. The algorithms are optimized for small subsets of all irreducible pentanomials, thus the total number of suitable polynomials that exist. \\
+
+\begin{table}
+\centering
+\caption{$GF(2^m)$ squarers for $x^m + x^a + x^b + x^c + 1$ in polynomial basis, $m > a > b > c > 0$, $m < 800$, $m$ prime, $\beta = \max{\{a, b, c, 0\}}$ such that $\beta \not \equiv m \pmod{2}$. Compare to results from Hariri \cite{hariri2009bit} and Park \cite{park2012explicit}}
+{\begin{tabular}{l r l}
+\label{table:comparison_squarer_background}
+Proposal / Polynomials & \# irreducible & XOR count / Delay  \\ \hline
+\specialcell{Hariri \\ $a=b+1=c+2$} & \specialcell{$602$} & \specialcell{$(m-3)/2 + m + 4$ \\ $2T_X$} \\ \hline
+\specialcell{Park \\ $a \leq \ceil{m/2}$} & \specialcell{$2,011,941$}& \specialcell{$\leq (3m+7a-b-3c+25)/2$ \\ $3T_X$} \\ \hline
+\end{tabular}}{}
+\end{table}
+
+Another class of interesting reduction algorithms are the ones that operate on NIST polynomials. NIST is the American National Insitute of Standards and Technolgoy, and is known for promoting cryptographic standards such as preferred finite fields for elliptic curves. \\
+
+Because these fields are standardized, they attract special attention from researchers looking to optimize arithmetic operations. The state of the art for squaring modulo a NIST pentanomial, for example, is from Park \cite{park2012explicit}. The performance of the algorithm is available at Table~\ref{table:comparison_nist_background}, and a comparison to naive reduction.
+
+\begin{table}
+\centering
+\caption{Squarer cost for NIST suggested ECC irreducible pentanomials, in number of XOR operations and circuit delay, where "naive reduction" is Algorithm~\ref{alg:reduce}.}
+{\begin{tabular}{l r r} \label{table:comparison_nist_background}
+Polynomial & Naive reduction & Park \cite{park2012explicit} \\ \hline
+$x^{163} + x^7 + x^6 + x^3 + 1$ & $648\oplus/~5T_X$ & $246\oplus/~3T_X$ \\ \hline
+$x^{283} + x^{12} + x^7 + x^5 + 1$ & $1,118\oplus/~5T_X$ & $\leq468\oplus/~\leq3T_X$  \\ \hline\
+$x^{571} + x^{10} + x^5 + x^2 + 1$ & $2,280\oplus/~4T_X$ & $\leq898\oplus/~\leq3T_X$
+\end{tabular}}{}
+\end{table}
+
+And for word-level reduction algorithms, Hankerson~\cite[p. 76]{hankerson2006guide} published the following results:
 
 \begin{itemize}
-\item $x^{163} + x^7 + x^6 + x^3 + 1$ - $C[0..10]$, 41 XORs, 36 SHIFTs, 1 AND = 78 operations
-\item $x^{233} + x^{74} + 1$ - $C[0..15!]$, 35 XORs, 35 SHIFTs, 1 AND = 71 operations
-\item $x^{283} + x^{12} + x^7 + x^5 + 1$ - $C[0..17]$, 76 XORs, 76 SHIFTs, 1 AND = 153 operations
-\item $x^{409} + x^{87} + 1$ - $C[0..25]$, 54 XORs, 54 SHIFTs, 1 AND = 109 operations
-\item $x^{571} + x^{10} + x^5 + x^2 + 1$ - $C[0..35]$, 148 XORs, 148 SHIFTs, 1 AND = 297 operations
+\item $x^{163} + x^7 + x^6 + x^3 + 1$: 41 XORs, 36 SHIFTs, 1 AND = 78 operations
+\item $x^{233} + x^{74} + 1$: 35 XORs, 35 SHIFTs, 1 AND = 71 operations
+\item $x^{283} + x^{12} + x^7 + x^5 + 1$: 76 XORs, 76 SHIFTs, 1 AND = 153 operations
+\item $x^{409} + x^{87} + 1$: 54 XORs, 54 SHIFTs, 1 AND = 109 operations
+\item $x^{571} + x^{10} + x^5 + x^2 + 1$: 148 XORs, 148 SHIFTs, 1 AND = 297 operations
 \end{itemize}
-
-
-Pentanomials of same degree from the family $x^{b+2c} + x^{b+c} + x^b + x^c + 1$
-
-\begin{itemize}
-\item $x^{233} + x^{158} + x^{83} + x^{74} + 1$, score 3.717, $k_a=4$
-\item $x^{163} + x^{117} + x^{71} + x^{46} + 1$, score 3.982, $k_a=4$
-\item $x^{409} + x^{294} + x^{179} + x^{115} + 1$, score 4.015, $k_a=4$
-\item $x^{409} + x^{337} + x^{265} + x^{72} + 1$, score 4.457, $k_a=6$
-\item $x^{233} + x^{217} + x^{201} + x^{16} + 1$, score 7.240, $k_a=15$
-\item ??571??
-\end{itemize}
-
-% TODO: referências.
