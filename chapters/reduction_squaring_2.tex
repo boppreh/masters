@@ -201,7 +201,7 @@ Proposal / Polynomials & \# irreducible & XOR count / Delay  \\ \hline
 \end{tabular}}{}
 \end{table}
 
-Our squarer has variable delay depending on the irreducible pentanomial used, with values between $3 T_X$ to $6 T_X$ observed for $m < 800$, $m$ prime, $a \leq \ceil{m/2}$ (see Table~\ref{table:square:delays} for statistical distribution). Additionally, one can manually tweak the resulting circuit in order to reduce the total time delay, as shown in Appendix~\ref{appendix:example}. \\
+Our squarer has variable delay depending on the irreducible pentanomial used, with values between $3 T_X$ to $6 T_X$ observed for $m < 800$, $m$ prime, $a \leq \ceil{m/2}$ (see Table~\ref{table:square:delays} for statistical distribution).\\
 
 Table~\ref{table:comparison_nist} compares the cost of using a naive reduction squaring (such as interspacing zeroes and applying Algorithm~\ref{alg:reduce}), with Park's squarer~\cite{park2012explicit} and our squarer (Algorithm~\ref{alg:square}) when applied to NIST ECC irreducible pentanomials. The squarer from Hariri~\cite{hariri2009bit} is not applicable in this case as NIST pentanomials are not of the format $x^m+x^{n+2}+x^{n+1}+x^{n}+1$. \\ 
 
@@ -216,6 +216,61 @@ $x^{283} + x^{12} + x^7 + x^5 + 1$ & $1,118\oplus/~5T_X$ & $\leq468\oplus/~\leq3
 $x^{571} + x^{10} + x^5 + x^2 + 1$ & $2,280\oplus/~4T_X$ & $\leq898\oplus/~\leq3T_X$ & $870\oplus/~3T_X$
 \end{tabular}}{}
 \end{table}
+
+Additionally, one can manually tweak the resulting circuit in order to reduce the total time delay. For example, Algorithm~\ref{alg:square:example} is an instance of Algorithm~\ref{alg:square}, wherein the irreducible polynomial is defined as $x^{19}+x^5+x^2+x+1$ by simply fixing $f$. We note the circuit has a delay of $3T_X$, due to the critical paths of the circuit lines $C[5]$ and $C[2]$. This can be reduced by eliminating Lines 29, 31 and 38, and inserting $C[5] \leftarrow C[22] \oplus C[24]$ and $C[5] \leftarrow C[5] \oplus C[19]$ at the beginning, such that the delay of $C[5]$ is reduced to $2 T_X$ (and one XOR is saved). By moving Line 39 to before Line 36 the critical path of $C[2]$ is also reduced to only $2 T_X$, which becomes the total delay of the full circuit.\\
+
+\begin{algorithm}
+\caption{Squaring for $\F_{2^{19}} \cong \F_2[x]/(x^{19} + x^5 + x^2 + x + 1)$}
+\label{alg:square:example}
+\begin{multicols}{2}
+\begin{algorithmic}[1]
+\REQUIRE $A = [a_0, a_1, a_2, ..., a_{18}]$, \\$f(x)~=~x^{19}~+~x^5~+~x^2~+~x~+~1$
+\ENSURE $A^2 \mod f$
+\STATE $C = [a_0, 0, a_1, 0, a_2, 0, \ldots, 0, a_{18}]$
+\STATE $\mathbox{C[22]}{C[22]} \leftarrow C[22]  \oplus  C[36]$
+\STATE $\mathbox{C[22]}{C[19]} \leftarrow C[36]$
+\STATE $\mathbox{C[22]}{C[18]} \leftarrow C[18]  \oplus  C[36]$
+\STATE $\mathbox{C[22]}{C[17]} \leftarrow C[36]$
+\STATE $\mathbox{C[22]}{C[20]} \leftarrow C[20]  \oplus  C[34]$
+\STATE $\mathbox{C[22]}{C[17]} \leftarrow C[17]  \oplus  C[34]$
+\STATE $\mathbox{C[22]}{C[16]} \leftarrow C[16]  \oplus  C[34]$
+\STATE $\mathbox{C[22]}{C[15]} \leftarrow C[34]$
+\STATE $\mathbox{C[22]}{C[18]} \leftarrow C[18]  \oplus  C[32]$
+\STATE $\mathbox{C[22]}{C[15]} \leftarrow C[15]  \oplus  C[32]$
+\STATE $\mathbox{C[22]}{C[14]} \leftarrow C[14]  \oplus  C[32]$
+\STATE $\mathbox{C[22]}{C[13]} \leftarrow C[32]$
+\STATE $\mathbox{C[22]}{C[16]} \leftarrow C[16]  \oplus  C[30]$
+\STATE $\mathbox{C[22]}{C[13]} \leftarrow C[13]  \oplus  C[30]$
+\STATE $\mathbox{C[22]}{C[12]} \leftarrow C[12]  \oplus  C[30]$
+\STATE $\mathbox{C[22]}{C[11]} \leftarrow C[30]$
+\STATE $\mathbox{C[22]}{C[14]} \leftarrow C[14]  \oplus  C[28]$
+\STATE $\mathbox{C[22]}{C[11]} \leftarrow C[11]  \oplus  C[28]$
+\STATE $\mathbox{C[22]}{C[10]} \leftarrow C[10]  \oplus  C[28]$
+\STATE $\mathbox{C[22]}{C[9]} \leftarrow C[28]$
+\STATE $\mathbox{C[22]}{C[12]} \leftarrow C[12]  \oplus  C[26]$
+\STATE $\mathbox{C[22]}{C[9]} \leftarrow C[9]  \oplus  C[26]$
+\STATE $\mathbox{C[22]}{C[8]} \leftarrow C[8]  \oplus  C[26]$
+\STATE $\mathbox{C[22]}{C[7]} \leftarrow C[26]$
+\STATE $\mathbox{C[22]}{C[10]} \leftarrow C[10]  \oplus  C[24]$
+\STATE $\mathbox{C[22]}{C[7]} \leftarrow C[7]  \oplus  C[24]$
+\STATE $\mathbox{C[22]}{C[6]} \leftarrow C[6]  \oplus  C[24]$
+\STATE $\mathbox{C[22]}{C[5]} \leftarrow C[24]$
+\STATE $\mathbox{C[22]}{C[8]} \leftarrow C[8]  \oplus  C[22]$
+\STATE $\mathbox{C[22]}{C[5]} \leftarrow C[5]  \oplus  C[22]$
+\STATE $\mathbox{C[22]}{C[4]} \leftarrow C[4]  \oplus  C[22]$
+\STATE $\mathbox{C[22]}{C[3]} \leftarrow C[22]$
+\STATE $\mathbox{C[22]}{C[6]} \leftarrow C[6]  \oplus  C[20]$
+\STATE $\mathbox{C[22]}{C[3]} \leftarrow C[3]  \oplus  C[20]$
+\STATE $\mathbox{C[22]}{C[2]} \leftarrow C[2]  \oplus  C[20]$
+\STATE $\mathbox{C[22]}{C[1]} \leftarrow C[20]$
+\STATE $\mathbox{C[22]}{C[5]} \leftarrow C[5]  \oplus  C[19]$
+\STATE $\mathbox{C[22]}{C[2]} \leftarrow C[2]  \oplus  C[19]$
+\STATE $\mathbox{C[22]}{C[1]} \leftarrow C[1]  \oplus  C[19]$
+\STATE $\mathbox{C[22]}{C[0]} \leftarrow C[0]  \oplus  C[19]$
+\RETURN $C[0],~C[1],~C[2],~\ldots,~C[18]$
+\end{algorithmic}
+\end{multicols}
+\end{algorithm}
 
 \section{Generalized reduction and squaring in $GF(\MakeLowercase{p}^\MakeLowercase{m})$} \label{pth}
 
