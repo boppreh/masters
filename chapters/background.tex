@@ -104,13 +104,13 @@ This function, $\texttt{reduce}(C, x^m+ \cdots +1) = D$ is the main focus of thi
 
 \section{State of the art} \label{stateoftheart}
 
-Algorithms for reduction and squaring in binary fields usually require only bitwise XOR operations. Their efficiency is then measured by a function of $m$, for irreducible polynomials of a certain class. Additionally, circuit algorithms are concerned with the critical path delay, measured as the number of XOR operations found in the longest path in the circuit. \\
+Algorithms for reduction and squaring in binary fields usually require only bitwise XOR operations, and with no conditional operations. Therefore, the efficiency of these algorithms -- measured by the number of XOR operations -- only depends on the irreducible polynomial selected, with \emph{classes} of polynomials exhibiting different behavior. Additionally, circuit algorithms are concerned with the critical path delay, measured as the number of XOR operations found in the longest path in the circuit. \\
 
 For example, Table~\ref{table:comparison_squarer_background} compares the efficiency of two algorithms from the literature. The algorithms are optimized for small subsets of all irreducible pentanomials, thus the total number of suitable polynomials that exist. \\
 
 \begin{table}
 \centering
-\caption{$GF(2^m)$ squarers for $x^m + x^a + x^b + x^c + 1$ in polynomial basis, $m > a > b > c > 0$, $m < 800$, $m$ prime, $\beta = \max{\{a, b, c, 0\}}$ such that $\beta \not \equiv m \pmod{2}$. Compare to results from Hariri \cite{hariri2009bit} and Park \cite{park2012explicit}}
+\caption{$GF(2^m)$ squarers for $x^m + x^a + x^b + x^c + 1$ in polynomial basis, $m > a > b > c > 0$, $m < 800$, $m$ prime, $\beta = \max{\{a, b, c, 0\}}$ such that $\beta \not \equiv m \pmod{2}$, from Hariri \cite{hariri2009bit} and Park \cite{park2012explicit}.}
 {\begin{tabular}{l r l}
 \label{table:comparison_squarer_background}
 Proposal / Polynomials & \# irreducible & XOR count / Delay  \\ \hline
@@ -121,7 +121,7 @@ Proposal / Polynomials & \# irreducible & XOR count / Delay  \\ \hline
 
 Another class of interesting reduction algorithms are the ones that operate on NIST polynomials. NIST is the American National Institute of Standards and Technology, and is known for promoting cryptographic standards such as preferred finite fields for elliptic curves. \\
 
-Because these fields are standardized, they attract special attention from researchers looking to optimize arithmetic operations. The state of the art for squaring modulo a NIST pentanomial, for example, is from Park \cite{park2012explicit}. The performance of the algorithm is available at Table~\ref{table:comparison_nist_background}, and a comparison to naive reduction.
+Because these fields are standardized, they attract special attention from researchers looking to optimize arithmetic operations. The state of the art for squaring modulo a NIST pentanomial, for example, is from Park \cite{park2012explicit}. The performance of the algorithm is available at Table~\ref{table:comparison_nist_background}, and a comparison to the naive reduction method.
 
 \begin{table}
 \centering
@@ -134,12 +134,17 @@ $x^{571} + x^{10} + x^5 + x^2 + 1$ & $2,280\oplus/~4T_X$ & $\leq898\oplus/~\leq3
 \end{tabular}}{}
 \end{table}
 
-And for word-level reduction algorithms, Hankerson~\cite[p. 76]{hankerson2006guide} published the following results:
+For word-level reduction algorithms used in software, shifts will be required for alignment, and one AND operation for masking most significant word. Table~\ref{table:word_reduction_hankerson} shows the cost for word-level reduction algorithms optimized for NIST polynomials.
 
-\begin{itemize}
-\item $x^{163} + x^7 + x^6 + x^3 + 1$: 41 XORs, 36 SHIFTs, 1 AND = 78 operations
-\item $x^{233} + x^{74} + 1$: 35 XORs, 35 SHIFTs, 1 AND = 71 operations
-\item $x^{283} + x^{12} + x^7 + x^5 + 1$: 76 XORs, 76 SHIFTs, 1 AND = 153 operations
-\item $x^{409} + x^{87} + 1$: 54 XORs, 54 SHIFTs, 1 AND = 109 operations
-\item $x^{571} + x^{10} + x^5 + x^2 + 1$: 148 XORs, 148 SHIFTs, 1 AND = 297 operations
-\end{itemize}
+\begin{table}
+\centering
+\caption{Cost of word-level reduction algorithms optimized for specific polynomials~\cite[p. 55]{hankerson2006guide}}
+{\begin{tabular}{l r r r r} \label{table:word_reduction_hankerson}
+Irreducible polynomial & XORs & SHIFTs & ANDs & Total operations \\ \hline
+$x^{163} + x^7 + x^6 + x^3 + 1$ & 41 & 36 & 1 & 78 \\
+$x^{233} + x^{74} + 1$ & 35 & 35 & 1 & 71 \\
+$x^{283} + x^{12} + x^7 + x^5 + 1$ & 76 & 76 & 1 & 153 \\
+$x^{409} + x^{87} + 1$ & 54 & 54 & 1 & 109 \\
+$x^{571} + x^{10} + x^5 + x^2 + 1$ & 148 & 148 & 1 & 297
+\end{tabular}}{}
+\end{table}
